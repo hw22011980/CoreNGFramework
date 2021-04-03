@@ -1,0 +1,19 @@
+import { HttpInterceptor, HttpRequest, HttpHandler } from '@angular/common/http';
+import { Injectable } from '@angular/core';
+import { of } from 'rxjs';
+import { finalize } from 'rxjs/operators';
+import { SpinnerService } from 'src/app/spinner/spinner.service';
+
+@Injectable()
+export class LoadingIndicatorInterceptor implements HttpInterceptor {
+    constructor(private spinnerService: SpinnerService) { }
+
+    intercept(req: HttpRequest<any>, next: HttpHandler) {
+        if ((req.method === 'POST' || req.method === 'PUT') && !req.headers.has('Login')) {
+            return next.handle(req);
+        }
+
+        this.spinnerService.onRequestStarted(req.url);
+        return next.handle(req).pipe(finalize(() => this.spinnerService.onRequestFinished(req.url)));
+    }
+}

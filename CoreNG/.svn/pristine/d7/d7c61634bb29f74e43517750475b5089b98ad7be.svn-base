@@ -1,0 +1,6 @@
+<body>
+  <app-nav-menu-top></app-nav-menu-top>
+  <div class="container" style="width:100%">
+    <router-outlet></router-outlet>
+  </div>
+</body>

@@ -1,0 +1,12 @@
+<div class="container-fluid margin-right-info pt-5">
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb w-100">
+      <li class="breadcrumb-item" id="site-header"><a class="header" [routerLink]="['/sites']"
+          [class.disabled]="!disableClick ? true : null">SITES</a></li>
+      <li *ngIf="site!=null" class="breadcrumb-item" id="site-header">
+        <a class="header active custom-color" [class.disabled]="!disableClick ? true : null">{{site.siteID}}</a>
+      </li>
+    </ol>
+  </nav>
+  <router-outlet (activate)="onActivate($event)"></router-outlet>
+</div>

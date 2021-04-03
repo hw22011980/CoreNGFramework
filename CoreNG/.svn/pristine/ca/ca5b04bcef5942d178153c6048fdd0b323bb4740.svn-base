@@ -1,0 +1,34 @@
+export class InformationFields {
+    Header?: string;
+    Editable?: boolean;
+    Image?: boolean;
+    ImageSrc?: string;
+    InformationFields?: InformationField[];
+}
+
+export class InformationField {
+    Name?: string;
+    Description?: string;
+    Value?: any;
+    DisplayValue?: any; // Use this if the displayed value is different from the value
+    FieldType?: string; // Text, Dropdown, File, DateTime - used to correctly display edit ui
+    Editable?: boolean;
+    OptionValues?: any;
+    OptionValues2?: any; // children list for cascade drop down
+    Required?: boolean;
+    MaxLength?: number; // maximum length if text, maximum number if integer values
+    MinLength?: number; // minimum length if text, minimum number on integer values
+    FileExtension?: string;
+    AlphaNumeric?: boolean; // true for alphanumeric, false to allow special characters.
+                            // Special characters allowed: dash and underscore only.
+    TextPattern?: string;    // Specific Text Pattern if applicable
+    TextPatternDescription?: string; // Readable Text Pattern for information and display purposes
+}
+
+export class UpdateInformationFieldResults {
+    UpdateInformationFieldResults: UpdateInformationFieldResult[];
+}
+export class UpdateInformationFieldResult {
+    Name?: string;
+    Value?: any;
+}

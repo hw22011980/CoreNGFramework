@@ -1,0 +1,144 @@
+* {
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+body {
+    padding: 0;
+    margin: 0;
+}
+
+#error {
+    position: relative;
+    height: 100vh;
+}
+
+#error .error {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    -webkit-transform: translate(-50%, -50%);
+    -ms-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
+}
+
+.error {
+    max-width: 90%;
+    width: 100%;
+    text-align: center;
+    padding: 0px 15px;
+    line-height: 1.4;
+}
+
+.error .error-title {
+    height: 50px;
+    line-height: 30px;
+}
+
+.error .error-title h1 {
+    font-size: 20px;
+    margin: 0px;
+    color: #AA0000;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.error h2 {
+    font-size: 16px;
+    font-weight: 400;
+    color: #222;
+    margin: 0;
+    padding-bottom: 15px;
+}
+
+.error .key-list {
+    font-size: 12px;
+    font-weight: 400;
+    color: #222;
+    padding-bottom: 15px;
+    line-height: 25px;
+}
+
+.error .key-list h3 {
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.error .key-list ul {
+    padding: 0;
+    margin: 0;
+    text-align: center;
+    list-style: inside;
+}
+
+.error h3 {
+    font-size: 14px;
+    font-weight: 400;
+    color: #222;
+    margin: 0;
+    padding-top: 10px;
+}
+
+@media only screen and (max-width: 800px) {
+    .error .error-title {
+        height: 30px;
+        line-height: 10px;
+    }
+    .error .error-title h1 {
+        font-size: 18px;
+    }
+}
+
+.license-create {
+    position: relative;
+    max-width: 65%;
+    width: 100%;
+    margin: 15px auto 22px;
+}
+
+.error-footer {
+    position: relative;
+    max-width: 420px;
+    width: 100%;
+    margin: 5px auto 22px;
+}
+
+.error-footer a {
+    display: inline-block;
+    font-weight: 700;
+    font-size: 17px;
+    border-radius: 15px;
+    text-decoration: none;
+    color: #AA0000;
+    cursor: pointer;
+}
+
+.error-footer a:hover{
+    color: blue;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.spacer {
+    width: 0.699em;
+    text-align: center;
+    display: inline-block;
+    font-weight: 700;
+    font-size: 18px;
+    border-radius: 15px;
+    text-decoration: none;
+    color: black;
+}
+
+.license-label {
+    font-weight: 550 !important;
+}
+
+.license-button {
+    font-weight: 500 !important;
+}
+
+.inputError{    
+    color: red;
+    font-size: 14px;
+}

@@ -1,0 +1,1212 @@
+{
+  "success": true,
+  "code": 0,
+  "message": "Get Metadata and Value from Meter 'HY_10X' By Param ID = 21 in 383ms",
+  "plantNumber": "HY_10X",
+  "data": {
+    "id": "21",
+    "name": "Load Profile Block 1 Parameters",
+    "message": "",
+    "size": 1,
+    "readOnly": false,
+    "items": [
+      {
+        "id": 0,
+        "displayDataType": "LoadProfile",
+        "min": "0",
+        "max": "20",
+        "prefixUnit": "",
+        "postfixUnit": "",
+        "visible": true,
+        "visible2": false,
+        "enumGroup": "",
+        "name": "Load Profile Block 1",
+        "dataType": "Structure",
+        "size": 3,
+        "readOnly": false,
+        "items": [
+          {
+            "id": 3901,
+            "displayDataType": "DropDownList",
+            "min": "0",
+            "max": "0",
+            "prefixUnit": "",
+            "postfixUnit": "",
+            "visible": true,
+            "visible2": true,
+            "availableValues": [
+              {
+                "name": "Disabled",
+                "value": "0",
+                "label": ""
+              },
+              {
+                "name": "1 minute",
+                "value": "1",
+                "label": ""
+              },
+              {
+                "name": "2 minutes",
+                "value": "2",
+                "label": ""
+              },
+              {
+                "name": "3 minutes",
+                "value": "3",
+                "label": ""
+              },
+              {
+                "name": "4 minutes",
+                "value": "4",
+                "label": ""
+              },
+              {
+                "name": "5 minutes",
+                "value": "5",
+                "label": ""
+              },
+              {
+                "name": "6 minutes",
+                "value": "6",
+                "label": ""
+              },
+              {
+                "name": "10 minutes",
+                "value": "10",
+                "label": ""
+              },
+              {
+                "name": "15 minutes",
+                "value": "15",
+                "label": ""
+              },
+              {
+                "name": "30 minutes",
+                "value": "30",
+                "label": ""
+              },
+              {
+                "name": "45 minutes",
+                "value": "45",
+                "label": ""
+              },
+              {
+                "name": "1 hour",
+                "value": "60",
+                "label": ""
+              },
+              {
+                "name": "1.5 hours",
+                "value": "90",
+                "label": ""
+              },
+              {
+                "name": "2 hours",
+                "value": "120",
+                "label": ""
+              },
+              {
+                "name": "4 hours",
+                "value": "240",
+                "label": ""
+              },
+              {
+                "name": "5 hours",
+                "value": "300",
+                "label": ""
+              },
+              {
+                "name": "6 hours",
+                "value": "360",
+                "label": ""
+              },
+              {
+                "name": "7 hours",
+                "value": "420",
+                "label": ""
+              },
+              {
+                "name": "8 hours",
+                "value": "480",
+                "label": ""
+              },
+              {
+                "name": "9 hours",
+                "value": "540",
+                "label": ""
+              },
+              {
+                "name": "10 hours",
+                "value": "600",
+                "label": ""
+              },
+              {
+                "name": "11 hours",
+                "value": "660",
+                "label": ""
+              },
+              {
+                "name": "12 hours",
+                "value": "720",
+                "label": ""
+              },
+              {
+                "name": "13 hours",
+                "value": "780",
+                "label": ""
+              },
+              {
+                "name": "14 hours",
+                "value": "840",
+                "label": ""
+              },
+              {
+                "name": "15 hours",
+                "value": "900",
+                "label": ""
+              },
+              {
+                "name": "16 hours",
+                "value": "960",
+                "label": ""
+              },
+              {
+                "name": "17 hours",
+                "value": "1020",
+                "label": ""
+              },
+              {
+                "name": "18 hours",
+                "value": "1080",
+                "label": ""
+              },
+              {
+                "name": "19 hours",
+                "value": "1140",
+                "label": ""
+              },
+              {
+                "name": "20 hours",
+                "value": "1200",
+                "label": ""
+              },
+              {
+                "name": "21 hours",
+                "value": "1260",
+                "label": ""
+              },
+              {
+                "name": "22 hours",
+                "value": "1320",
+                "label": ""
+              },
+              {
+                "name": "23 hours",
+                "value": "1380",
+                "label": ""
+              },
+              {
+                "name": "1 day",
+                "value": "1440",
+                "label": ""
+              }
+            ],
+            "enumGroup": "LPRecordingInterval",
+            "name": "Recording Interval",
+            "dataType": "LongUnsigned",
+            "size": 1,
+            "readOnly": false,
+            "value": "10"
+          },
+          {
+            "id": 3902,
+            "displayDataType": "NumericBox",
+            "min": "0",
+            "max": "1000",
+            "prefixUnit": "",
+            "postfixUnit": "",
+            "visible": false,
+            "visible2": false,
+            "enumGroup": "",
+            "name": "ClockModifThreshold",
+            "dataType": "Unsigned",
+            "size": 1,
+            "readOnly": false,
+            "value": "0"
+          },
+          {
+            "id": 3903,
+            "displayDataType": "Table",
+            "min": "0",
+            "max": "20",
+            "prefixUnit": "",
+            "postfixUnit": "",
+            "visible": true,
+            "visible2": true,
+            "enumGroup": "",
+            "name": "RegisterChannel",
+            "dataType": "Array",
+            "size": 0,
+            "readOnly": false,
+            "items": [
+              {
+                "id": 3904,
+                "displayDataType": "TableRow",
+                "min": "0",
+                "max": "4",
+                "prefixUnit": "",
+                "postfixUnit": "",
+                "visible": true,
+                "visible2": true,
+                "enumGroup": "",
+                "name": "RegisterChannel - Members",
+                "dataType": "Structure",
+                "size": 4,
+                "readOnly": false,
+                "items": [
+                  {
+                    "id": 3905,
+                    "displayDataType": "DropDownTable",
+                    "min": "0",
+                    "max": "0",
+                    "prefixUnit": "",
+                    "postfixUnit": "",
+                    "visible": true,
+                    "visible2": true,
+                    "availableValues": [
+                      {
+                        "name": "Export Wh Phase A",
+                        "value": 0,
+                        "label": "Export Wh Phase A|Wh|0|0;1;2;3|Averaging;Cumulative"
+                      },
+                      {
+                        "name": "Export Wh Phase B",
+                        "value": 1,
+                        "label": "Export Wh Phase B|Wh|1|0;1;2;3|Averaging;Cumulative"
+                      },
+                      {
+                        "name": "Export Wh Phase C",
+                        "value": 2,
+                        "label": "Export Wh Phase C|Wh|2|0;1;2;3|Averaging;Cumulative"
+                      },
+                      {
+                        "name": "Export Wh Total",
+                        "value": 3,
+                        "label": "Export Wh Total|Wh|3|0;1;2;3|Averaging;Cumulative"
+                      },
+                      {
+                        "name": "Import Wh Phase A",
+                        "value": 4,
+                        "label": "Import Wh Phase A|Wh|4|0;1;2;3|Averaging;Cumulative"
+                      },
+                      {
+                        "name": "Import Wh Phase B",
+                        "value": 5,
+                        "label": "Import Wh Phase B|Wh|5|0;1;2;3|Averaging;Cumulative"
+                      },
+                      {
+                        "name": "Import Wh Phase C",
+                        "value": 6,
+                        "label": "Import Wh Phase C|Wh|6|0;1;2;3|Averaging;Cumulative"
+                      },
+                      {
+                        "name": "Import Wh Total",
+                        "value": 7,
+                        "label": "Import Wh Total|Wh|7|0;1;2;3|Averaging;Cumulative"
+                      },
+                      {
+                        "name": "Import Wh Total Billing",
+                        "value": 8,
+                        "label": "Import Wh Total Billing|Wh|8|0;1;2;3|Averaging;Cumulative"
+                      },
+                      {
+                        "name": "Wh Total Billing",
+                        "value": 9,
+                        "label": "Wh Total Billing|Wh|9|0;1;2;3|Averaging;Cumulative"
+                      },
+                      {
+                        "name": "Export varh Phase A",
+                        "value": 10,
+                        "label": "Export varh Phase A|varh|10|0;1;2;3|Averaging;Cumulative"
+                      },
+                      {
+                        "name": "Export varh Phase B",
+                        "value": 11,
+                        "label": "Export varh Phase B|varh|11|0;1;2;3|Averaging;Cumulative"
+                      },
+                      {
+                        "name": "Export varh Phase C",
+                        "value": 12,
+                        "label": "Export varh Phase C|varh|12|0;1;2;3|Averaging;Cumulative"
+                      },
+                      {
+                        "name": "Export varh Total",
+                        "value": 13,
+                        "label": "Export varh Total|varh|13|0;1;2;3|Averaging;Cumulative"
+                      },
+                      {
+                        "name": "Export varh Total Billing",
+                        "value": 14,
+                        "label": "Export varh Total Billing|varh|14|0;1;2;3|Averaging;Cumulative"
+                      },
+                      {
+                        "name": "Import varh Phase A",
+                        "value": 15,
+                        "label": "Import varh Phase A|varh|15|0;1;2;3|Averaging;Cumulative"
+                      },
+                      {
+                        "name": "Import varh Phase B",
+                        "value": 16,
+                        "label": "Import varh Phase B|varh|16|0;1;2;3|Averaging;Cumulative"
+                      },
+                      {
+                        "name": "Import varh Phase C",
+                        "value": 17,
+                        "label": "Import varh Phase C|varh|17|0;1;2;3|Averaging;Cumulative"
+                      },
+                      {
+                        "name": "Import varh Total",
+                        "value": 18,
+                        "label": "Import varh Total|varh|18|0;1;2;3|Averaging;Cumulative"
+                      },
+                      {
+                        "name": "Import varh Total Billing",
+                        "value": 19,
+                        "label": "Import varh Total Billing|varh|19|0;1;2;3|Averaging;Cumulative"
+                      },
+                      {
+                        "name": "varh Total Billing",
+                        "value": 20,
+                        "label": "varh Total Billing|varh|20|0;1;2;3|Averaging;Cumulative"
+                      },
+                      {
+                        "name": "Export VAh Phase A",
+                        "value": 21,
+                        "label": "Export VAh Phase A|VAh|21|0;1;2;3|Averaging;Cumulative"
+                      },
+                      {
+                        "name": "Export VAh Phase B",
+                        "value": 22,
+                        "label": "Export VAh Phase B|VAh|22|0;1;2;3|Averaging;Cumulative"
+                      },
+                      {
+                        "name": "Export VAh Phase C",
+                        "value": 23,
+                        "label": "Export VAh Phase C|VAh|23|0;1;2;3|Averaging;Cumulative"
+                      },
+                      {
+                        "name": "Import VAh Phase A",
+                        "value": 24,
+                        "label": "Import VAh Phase A|VAh|24|0;1;2;3|Averaging;Cumulative"
+                      },
+                      {
+                        "name": "Import VAh Phase B",
+                        "value": 25,
+                        "label": "Import VAh Phase B|VAh|25|0;1;2;3|Averaging;Cumulative"
+                      },
+                      {
+                        "name": "Import VAh Phase C",
+                        "value": 26,
+                        "label": "Import VAh Phase C|VAh|26|0;1;2;3|Averaging;Cumulative"
+                      },
+                      {
+                        "name": "Export VAh Total",
+                        "value": 171,
+                        "label": "Export VAh Total|VAh|171|0;1;2;3|Averaging;Cumulative"
+                      },
+                      {
+                        "name": "Import VAh Total",
+                        "value": 172,
+                        "label": "Import VAh Total|VAh|172|0;1;2;3|Averaging;Cumulative"
+                      },
+                      {
+                        "name": "TOU Energy Total Export Wh Rate 1",
+                        "value": 27,
+                        "label": "TOU Energy Total Export Wh Rate 1|Wh|27|0;1;2;3|Averaging;Cumulative"
+                      },
+                      {
+                        "name": "TOU Energy Total Import Wh Rate 1",
+                        "value": 28,
+                        "label": "TOU Energy Total Import Wh Rate 1|Wh|28|0;1;2;3|Averaging;Cumulative"
+                      },
+                      {
+                        "name": "TOU Energy Total Export Wh Rate 2",
+                        "value": 29,
+                        "label": "TOU Energy Total Export Wh Rate 2|Wh|29|0;1;2;3|Averaging;Cumulative"
+                      },
+                      {
+                        "name": "TOU Energy Total Import Wh Rate 2",
+                        "value": 30,
+                        "label": "TOU Energy Total Import Wh Rate 2|Wh|30|0;1;2;3|Averaging;Cumulative"
+                      },
+                      {
+                        "name": "TOU Energy Total Export Wh Rate 3",
+                        "value": 31,
+                        "label": "TOU Energy Total Export Wh Rate 3|Wh|31|0;1;2;3|Averaging;Cumulative"
+                      },
+                      {
+                        "name": "TOU Energy Total Import Wh Rate 3",
+                        "value": 32,
+                        "label": "TOU Energy Total Import Wh Rate 3|Wh|32|0;1;2;3|Averaging;Cumulative"
+                      },
+                      {
+                        "name": "TOU Energy Total Export Wh Rate 4",
+                        "value": 33,
+                        "label": "TOU Energy Total Export Wh Rate 4|Wh|33|0;1;2;3|Averaging;Cumulative"
+                      },
+                      {
+                        "name": "TOU Energy Total Import Wh Rate 4",
+                        "value": 34,
+                        "label": "TOU Energy Total Import Wh Rate 4|Wh|34|0;1;2;3|Averaging;Cumulative"
+                      },
+                      {
+                        "name": "TOU Energy Total Export Wh Rate 5",
+                        "value": 35,
+                        "label": "TOU Energy Total Export Wh Rate 5|Wh|35|0;1;2;3|Averaging;Cumulative"
+                      },
+                      {
+                        "name": "TOU Energy Total Import Wh Rate 5",
+                        "value": 36,
+                        "label": "TOU Energy Total Import Wh Rate 5|Wh|36|0;1;2;3|Averaging;Cumulative"
+                      },
+                      {
+                        "name": "TOU Energy Total Export varh Rate 1",
+                        "value": 75,
+                        "label": "TOU Energy Total Export varh Rate 1|varh|75|0;1;2;3|Averaging;Cumulative"
+                      },
+                      {
+                        "name": "TOU Energy Total Import varh Rate 1",
+                        "value": 76,
+                        "label": "TOU Energy Total Import varh Rate 1|varh|76|0;1;2;3|Averaging;Cumulative"
+                      },
+                      {
+                        "name": "TOU Energy Total Export varh Rate 2",
+                        "value": 77,
+                        "label": "TOU Energy Total Export varh Rate 2|varh|77|0;1;2;3|Averaging;Cumulative"
+                      },
+                      {
+                        "name": "TOU Energy Total Import varh Rate 2",
+                        "value": 78,
+                        "label": "TOU Energy Total Import varh Rate 2|varh|78|0;1;2;3|Averaging;Cumulative"
+                      },
+                      {
+                        "name": "TOU Energy Total Export varh Rate 3",
+                        "value": 79,
+                        "label": "TOU Energy Total Export varh Rate 3|varh|79|0;1;2;3|Averaging;Cumulative"
+                      },
+                      {
+                        "name": "TOU Energy Total Import varh Rate 3",
+                        "value": 80,
+                        "label": "TOU Energy Total Import varh Rate 3|varh|80|0;1;2;3|Averaging;Cumulative"
+                      },
+                      {
+                        "name": "TOU Energy Total Export varh Rate 4",
+                        "value": 81,
+                        "label": "TOU Energy Total Export varh Rate 4|varh|81|0;1;2;3|Averaging;Cumulative"
+                      },
+                      {
+                        "name": "TOU Energy Total Import varh Rate 4",
+                        "value": 82,
+                        "label": "TOU Energy Total Import varh Rate 4|varh|82|0;1;2;3|Averaging;Cumulative"
+                      },
+                      {
+                        "name": "TOU Energy Total Export varh Rate 5",
+                        "value": 83,
+                        "label": "TOU Energy Total Export varh Rate 5|varh|83|0;1;2;3|Averaging;Cumulative"
+                      },
+                      {
+                        "name": "TOU Energy Total Import varh Rate 5",
+                        "value": 84,
+                        "label": "TOU Energy Total Import varh Rate 5|varh|84|0;1;2;3|Averaging;Cumulative"
+                      },
+                      {
+                        "name": "TOU Energy Total Export VAh Rate 1",
+                        "value": 123,
+                        "label": "TOU Energy Total Export VAh Rate 1|VAh|123|0;1;2;3|Averaging;Cumulative"
+                      },
+                      {
+                        "name": "TOU Energy Total Import VAh Rate 1",
+                        "value": 124,
+                        "label": "TOU Energy Total Import VAh Rate 1|VAh|124|0;1;2;3|Averaging;Cumulative"
+                      },
+                      {
+                        "name": "TOU Energy Total Export VAh Rate 2",
+                        "value": 125,
+                        "label": "TOU Energy Total Export VAh Rate 2|VAh|125|0;1;2;3|Averaging;Cumulative"
+                      },
+                      {
+                        "name": "TOU Energy Total Import VAh Rate 2",
+                        "value": 126,
+                        "label": "TOU Energy Total Import VAh Rate 2|VAh|126|0;1;2;3|Averaging;Cumulative"
+                      },
+                      {
+                        "name": "TOU Energy Total Export VAh Rate 3",
+                        "value": 127,
+                        "label": "TOU Energy Total Export VAh Rate 3|VAh|127|0;1;2;3|Averaging;Cumulative"
+                      },
+                      {
+                        "name": "TOU Energy Total Import VAh Rate 3",
+                        "value": 128,
+                        "label": "TOU Energy Total Import VAh Rate 3|VAh|128|0;1;2;3|Averaging;Cumulative"
+                      },
+                      {
+                        "name": "TOU Energy Total Export VAh Rate 4",
+                        "value": 129,
+                        "label": "TOU Energy Total Export VAh Rate 4|VAh|129|0;1;2;3|Averaging;Cumulative"
+                      },
+                      {
+                        "name": "TOU Energy Total Import VAh Rate 4",
+                        "value": 130,
+                        "label": "TOU Energy Total Import VAh Rate 4|VAh|130|0;1;2;3|Averaging;Cumulative"
+                      },
+                      {
+                        "name": "TOU Energy Total Export VAh Rate 5",
+                        "value": 131,
+                        "label": "TOU Energy Total Export VAh Rate 5|VAh|131|0;1;2;3|Averaging;Cumulative"
+                      },
+                      {
+                        "name": "TOU Energy Total Import VAh Rate 5",
+                        "value": 132,
+                        "label": "TOU Energy Total Import VAh Rate 5|VAh|132|0;1;2;3|Averaging;Cumulative"
+                      },
+                      {
+                        "name": "Export Active Power Phase A",
+                        "value": 173,
+                        "label": "Export Active Power Phase A|W|173|-3;-2;-1;0;1;2;3|Averaging"
+                      },
+                      {
+                        "name": "Export Active Power Phase B",
+                        "value": 174,
+                        "label": "Export Active Power Phase B|W|174|-3;-2;-1;0;1;2;3|Averaging"
+                      },
+                      {
+                        "name": "Export Active Power Phase C",
+                        "value": 175,
+                        "label": "Export Active Power Phase C|W|175|-3;-2;-1;0;1;2;3|Averaging"
+                      },
+                      {
+                        "name": "Import Active Power Phase A",
+                        "value": 176,
+                        "label": "Import Active Power Phase A|W|176|-3;-2;-1;0;1;2;3|Averaging"
+                      },
+                      {
+                        "name": "Import Active Power Phase B",
+                        "value": 177,
+                        "label": "Import Active Power Phase B|W|177|-3;-2;-1;0;1;2;3|Averaging"
+                      },
+                      {
+                        "name": "Import Active Power Phase C",
+                        "value": 178,
+                        "label": "Import Active Power Phase C|W|178|-3;-2;-1;0;1;2;3|Averaging"
+                      },
+                      {
+                        "name": "Export Active Power Total",
+                        "value": 179,
+                        "label": "Export Active Power Total|W|179|-3;-2;-1;0;1;2;3|Averaging"
+                      },
+                      {
+                        "name": "Import Active Power Total",
+                        "value": 180,
+                        "label": "Import Active Power Total|W|180|-3;-2;-1;0;1;2;3|Averaging"
+                      },
+                      {
+                        "name": "Export Reactive Power Phase A",
+                        "value": 181,
+                        "label": "Export Reactive Power Phase A|var|181|-3;-2;-1;0;1;2;3|Averaging"
+                      },
+                      {
+                        "name": "Export Reactive Power Phase B",
+                        "value": 182,
+                        "label": "Export Reactive Power Phase B|var|182|-3;-2;-1;0;1;2;3|Averaging"
+                      },
+                      {
+                        "name": "Export Reactive Power Phase C",
+                        "value": 183,
+                        "label": "Export Reactive Power Phase C|var|183|-3;-2;-1;0;1;2;3|Averaging"
+                      },
+                      {
+                        "name": "Import Reactive Power Phase A",
+                        "value": 184,
+                        "label": "Import Reactive Power Phase A|var|184|-3;-2;-1;0;1;2;3|Averaging"
+                      },
+                      {
+                        "name": "Import Reactive Power Phase B",
+                        "value": 185,
+                        "label": "Import Reactive Power Phase B|var|185|-3;-2;-1;0;1;2;3|Averaging"
+                      },
+                      {
+                        "name": "Import Reactive Power Phase C",
+                        "value": 186,
+                        "label": "Import Reactive Power Phase C|var|186|-3;-2;-1;0;1;2;3|Averaging"
+                      },
+                      {
+                        "name": "Export Reactive Power Total",
+                        "value": 187,
+                        "label": "Export Reactive Power Total|var|187|-3;-2;-1;0;1;2;3|Averaging"
+                      },
+                      {
+                        "name": "Import Reactive Power Total",
+                        "value": 188,
+                        "label": "Import Reactive Power Total|var|188|-3;-2;-1;0;1;2;3|Averaging"
+                      },
+                      {
+                        "name": "Export Apparent Power Phase A",
+                        "value": 189,
+                        "label": "Export Apparent Power Phase A|VA|189|-3;-2;-1;0;1;2;3|Averaging"
+                      },
+                      {
+                        "name": "Export Apparent Power Phase B",
+                        "value": 190,
+                        "label": "Export Apparent Power Phase B|VA|190|-3;-2;-1;0;1;2;3|Averaging"
+                      },
+                      {
+                        "name": "Export Apparent Power Phase C",
+                        "value": 191,
+                        "label": "Export Apparent Power Phase C|VA|191|-3;-2;-1;0;1;2;3|Averaging"
+                      },
+                      {
+                        "name": "Import Apparent Power Phase A",
+                        "value": 192,
+                        "label": "Import Apparent Power Phase A|VA|192|-3;-2;-1;0;1;2;3|Averaging"
+                      },
+                      {
+                        "name": "Import Apparent Powerr Phase B",
+                        "value": 193,
+                        "label": "Import Apparent Powerr Phase B|VA|193|-3;-2;-1;0;1;2;3|Averaging"
+                      },
+                      {
+                        "name": "Import Apparent Power Phase C",
+                        "value": 194,
+                        "label": "Import Apparent Power Phase C|VA|194|-3;-2;-1;0;1;2;3|Averaging"
+                      },
+                      {
+                        "name": "Export Apparent Power Total",
+                        "value": 195,
+                        "label": "Export Apparent Power Total|VA|195|-3;-2;-1;0;1;2;3|Averaging"
+                      },
+                      {
+                        "name": "Import Apparent Power Total",
+                        "value": 196,
+                        "label": "Import Apparent Power Total|VA|196|-3;-2;-1;0;1;2;3|Averaging"
+                      },
+                      {
+                        "name": "Power Factor Phase A",
+                        "value": 197,
+                        "label": "Power Factor Phase A|No Unit|197|-3;-2;-1;0;1;2;3|Averaging"
+                      },
+                      {
+                        "name": "Power Factor Phase B",
+                        "value": 198,
+                        "label": "Power Factor Phase B|No Unit|198|-3;-2;-1;0;1;2;3|Averaging"
+                      },
+                      {
+                        "name": "Power Factor Phase C",
+                        "value": 199,
+                        "label": "Power Factor Phase C|No Unit|199|-3;-2;-1;0;1;2;3|Averaging"
+                      },
+                      {
+                        "name": "Power Factor Total",
+                        "value": 200,
+                        "label": "Power Factor Total|No Unit|200|-3;-2;-1;0;1;2;3|Averaging"
+                      },
+                      {
+                        "name": "Voltage Phase A",
+                        "value": 201,
+                        "label": "Voltage Phase A|V|201|-3;-2;-1;0;1;2;3|Averaging"
+                      },
+                      {
+                        "name": "Voltage Phase B",
+                        "value": 202,
+                        "label": "Voltage Phase B|V|202|-3;-2;-1;0;1;2;3|Averaging"
+                      },
+                      {
+                        "name": "Voltage Phase C",
+                        "value": 203,
+                        "label": "Voltage Phase C|V|203|-3;-2;-1;0;1;2;3|Averaging"
+                      },
+                      {
+                        "name": "Neutral Voltage",
+                        "value": 204,
+                        "label": "Neutral Voltage|V|204|-3;-2;-1;0;1;2;3|Averaging"
+                      },
+                      {
+                        "name": "Current Phase A",
+                        "value": 205,
+                        "label": "Current Phase A|A|205|-3;-2;-1;0;1;2;3|Averaging"
+                      },
+                      {
+                        "name": "Current Phase B",
+                        "value": 206,
+                        "label": "Current Phase B|A|206|-3;-2;-1;0;1;2;3|Averaging"
+                      },
+                      {
+                        "name": "Current Phase C",
+                        "value": 207,
+                        "label": "Current Phase C|A|207|-3;-2;-1;0;1;2;3|Averaging"
+                      },
+                      {
+                        "name": "Neutral Current",
+                        "value": 208,
+                        "label": "Neutral Current|A|208|-3;-2;-1;0;1;2;3|Averaging"
+                      },
+                      {
+                        "name": "Frequency",
+                        "value": 209,
+                        "label": "Frequency|Hz|209|-3;-2;-1;0;1;2;3|Averaging"
+                      },
+                      {
+                        "name": "Frequency Phase A",
+                        "value": 222,
+                        "label": "Frequency Phase A|Hz|222|-3;-2;-1;0;1;2;3|Averaging"
+                      },
+                      {
+                        "name": "Frequency Phase B",
+                        "value": 223,
+                        "label": "Frequency Phase B|Hz|223|-3;-2;-1;0;1;2;3|Averaging"
+                      },
+                      {
+                        "name": "Frequency Phase C",
+                        "value": 224,
+                        "label": "Frequency Phase C|Hz|224|-3;-2;-1;0;1;2;3|Averaging"
+                      },
+                      {
+                        "name": "Angle_U1_I1",
+                        "value": 225,
+                        "label": "Angle_U1_I1|No Unit|225|-3;-2;-1;0;1;2;3|Averaging"
+                      },
+                      {
+                        "name": "Angle_U2_I2",
+                        "value": 226,
+                        "label": "Angle_U2_I2|No Unit|226|-3;-2;-1;0;1;2;3|Averaging"
+                      },
+                      {
+                        "name": "Angle_U3_I3",
+                        "value": 227,
+                        "label": "Angle_U3_I3|No Unit|227|-3;-2;-1;0;1;2;3|Averaging"
+                      },
+                      {
+                        "name": "Voltage Angle A-B",
+                        "value": 228,
+                        "label": "Voltage Angle A-B|No Unit|228|-3;-2;-1;0;1;2;3|Averaging"
+                      },
+                      {
+                        "name": "Voltage Angle A-C",
+                        "value": 229,
+                        "label": "Voltage Angle A-C|No Unit|229|-3;-2;-1;0;1;2;3|Averaging"
+                      },
+                      {
+                        "name": "Voltage Angle B-C",
+                        "value": 230,
+                        "label": "Voltage Angle B-C|No Unit|230|-3;-2;-1;0;1;2;3|Averaging"
+                      },
+                      {
+                        "name": "Current Angle A-B",
+                        "value": 231,
+                        "label": "Current Angle A-B|No Unit|231|-3;-2;-1;0;1;2;3|Averaging"
+                      },
+                      {
+                        "name": "Current Angle A-C",
+                        "value": 232,
+                        "label": "Current Angle A-C|No Unit|232|-3;-2;-1;0;1;2;3|Averaging"
+                      },
+                      {
+                        "name": "Current Angle B-C",
+                        "value": 233,
+                        "label": "Current Angle B-C|No Unit|233|-3;-2;-1;0;1;2;3|Averaging"
+                      },
+                      {
+                        "name": "THD Voltage Phase A",
+                        "value": 210,
+                        "label": "THD Voltage Phase A|No Unit|210|-3;-2;-1;0;1;2;3|Averaging"
+                      },
+                      {
+                        "name": "THD Voltage Phase B",
+                        "value": 211,
+                        "label": "THD Voltage Phase B|No Unit|211|-3;-2;-1;0;1;2;3|Averaging"
+                      },
+                      {
+                        "name": "THD Voltage Phase C",
+                        "value": 212,
+                        "label": "THD Voltage Phase C|No Unit|212|-3;-2;-1;0;1;2;3|Averaging"
+                      },
+                      {
+                        "name": "THD Voltage Total",
+                        "value": 213,
+                        "label": "THD Voltage Total|No Unit|213|-3;-2;-1;0;1;2;3|Averaging"
+                      },
+                      {
+                        "name": "THD Current Phase A",
+                        "value": 214,
+                        "label": "THD Current Phase A|No Unit|214|-3;-2;-1;0;1;2;3|Averaging"
+                      },
+                      {
+                        "name": "THD Current Phase B",
+                        "value": 215,
+                        "label": "THD Current Phase B|No Unit|215|-3;-2;-1;0;1;2;3|Averaging"
+                      },
+                      {
+                        "name": "THD Current Phase C",
+                        "value": 216,
+                        "label": "THD Current Phase C|No Unit|216|-3;-2;-1;0;1;2;3|Averaging"
+                      },
+                      {
+                        "name": "THD Current Total",
+                        "value": 217,
+                        "label": "THD Current Total|No Unit|217|-3;-2;-1;0;1;2;3|Averaging"
+                      },
+                      {
+                        "name": "TDD Current Phase A",
+                        "value": 218,
+                        "label": "TDD Current Phase A|No Unit|218|-3;-2;-1;0;1;2;3|Averaging"
+                      },
+                      {
+                        "name": "TDD Current Phase B",
+                        "value": 219,
+                        "label": "TDD Current Phase B|No Unit|219|-3;-2;-1;0;1;2;3|Averaging"
+                      },
+                      {
+                        "name": "TDD Current Phase C",
+                        "value": 220,
+                        "label": "TDD Current Phase C|No Unit|220|-3;-2;-1;0;1;2;3|Averaging"
+                      },
+                      {
+                        "name": "TDD Current Total",
+                        "value": 221,
+                        "label": "TDD Current Total|No Unit|221|-3;-2;-1;0;1;2;3|Averaging"
+                      },
+                      {
+                        "name": "Absolute Wh Total +pos",
+                        "value": 235,
+                        "label": "Absolute Wh Total +pos|Wh|235|0;1;2;3|Averaging;Cumulative"
+                      },
+                      {
+                        "name": "Absolute Wh Total -neg",
+                        "value": 236,
+                        "label": "Absolute Wh Total -neg|Wh|236|0;1;2;3|Averaging;Cumulative"
+                      },
+                      {
+                        "name": "TOU MD Export Watt Total",
+                        "value": 237,
+                        "label": "TOU MD Export Watt Total|W|237|-3;-2;-1;0;1;2;3|Averaging"
+                      },
+                      {
+                        "name": "TOU MD Import Watt Total",
+                        "value": 238,
+                        "label": "TOU MD Import Watt Total|W|238|-3;-2;-1;0;1;2;3|Averaging"
+                      },
+                      {
+                        "name": "TOU MD Export var Total",
+                        "value": 243,
+                        "label": "TOU MD Export var Total|var|243|-3;-2;-1;0;1;2;3|Averaging"
+                      },
+                      {
+                        "name": "TOU MD Import var Total",
+                        "value": 244,
+                        "label": "TOU MD Import var Total|var|244|-3;-2;-1;0;1;2;3|Averaging"
+                      },
+                      {
+                        "name": "TOU MD Export VA Total",
+                        "value": 249,
+                        "label": "TOU MD Export VA Total|VA|249|-3;-2;-1;0;1;2;3|Averaging"
+                      },
+                      {
+                        "name": "TOU MD Import VA Total",
+                        "value": 250,
+                        "label": "TOU MD Import VA Total|VA|250|-3;-2;-1;0;1;2;3|Averaging"
+                      },
+                      {
+                        "name": "MD Summary Absolute Watt",
+                        "value": 239,
+                        "label": "MD Summary Absolute Watt|W|239|-3;-2;-1;0;1;2;3|Averaging"
+                      },
+                      {
+                        "name": "MD Summary Absolute var",
+                        "value": 245,
+                        "label": "MD Summary Absolute var|var|245|-3;-2;-1;0;1;2;3|Averaging"
+                      },
+                      {
+                        "name": "MD Summary Absolute VA",
+                        "value": 251,
+                        "label": "MD Summary Absolute VA|VA|251|-3;-2;-1;0;1;2;3|Averaging"
+                      },
+                      {
+                        "name": "Export Watt Total",
+                        "value": 240,
+                        "label": "Export Watt Total|W|240|-3;-2;-1;0;1;2;3|Averaging"
+                      },
+                      {
+                        "name": "Import Watt Total",
+                        "value": 241,
+                        "label": "Import Watt Total|W|241|-3;-2;-1;0;1;2;3|Averaging"
+                      },
+                      {
+                        "name": "Export var Total",
+                        "value": 246,
+                        "label": "Export var Total|var|246|-3;-2;-1;0;1;2;3|Averaging"
+                      },
+                      {
+                        "name": "Import var Total",
+                        "value": 247,
+                        "label": "Import var Total|var|247|-3;-2;-1;0;1;2;3|Averaging"
+                      },
+                      {
+                        "name": "Export VA Total",
+                        "value": 252,
+                        "label": "Export VA Total|VA|252|-3;-2;-1;0;1;2;3|Averaging"
+                      },
+                      {
+                        "name": "Import VA Total",
+                        "value": 253,
+                        "label": "Import VA Total|VA|253|-3;-2;-1;0;1;2;3|Averaging"
+                      },
+                      {
+                        "name": "Absolute Watt Total",
+                        "value": 242,
+                        "label": "Absolute Watt Total|W|242|-3;-2;-1;0;1;2;3|Averaging"
+                      },
+                      {
+                        "name": "Absolute var Total",
+                        "value": 248,
+                        "label": "Absolute var Total|var|248|-3;-2;-1;0;1;2;3|Averaging"
+                      },
+                      {
+                        "name": "Absolute VA Total",
+                        "value": 254,
+                        "label": "Absolute VA Total|VA|254|-3;-2;-1;0;1;2;3|Averaging"
+                      },
+                      {
+                        "name": "Temperature Total",
+                        "value": 234,
+                        "label": "Temperature Total|°C|234|-3;-2;-1;0;1;2;3|Averaging;Cumulative"
+                      }
+                    ],
+                    "enumGroup": "LPRegisterChannel",
+                    "name": "Register ID",
+                    "dataType": "Enum",
+                    "size": 1,
+                    "readOnly": false,
+                    "value": "Register ID|Unit|ID=0|Scaler=1|Working Mode=1"
+                  },
+                  {
+                    "id": 3906,
+                    "displayDataType": "DropDownList",
+                    "min": "0",
+                    "max": "0",
+                    "prefixUnit": "",
+                    "postfixUnit": "",
+                    "visible": true,
+                    "visible2": true,
+                    "availableValues": [
+                      {
+                        "name": "-3",
+                        "value": "253",
+                        "label": ""
+                      },
+                      {
+                        "name": "-2",
+                        "value": "254",
+                        "label": ""
+                      },
+                      {
+                        "name": "-1",
+                        "value": "255",
+                        "label": ""
+                      },
+                      {
+                        "name": "0",
+                        "value": "0",
+                        "label": ""
+                      },
+                      {
+                        "name": "1",
+                        "value": "1",
+                        "label": ""
+                      },
+                      {
+                        "name": "2",
+                        "value": "2",
+                        "label": ""
+                      },
+                      {
+                        "name": "3",
+                        "value": "3",
+                        "label": ""
+                      }
+                    ],
+                    "enumGroup": "LPScaler",
+                    "name": "Scaler",
+                    "dataType": "Unsigned",
+                    "size": 1,
+                    "readOnly": false,
+                    "value": ""
+                  },
+                  {
+                    "id": 3907,
+                    "displayDataType": "DropDownList",
+                    "min": "0",
+                    "max": "0",
+                    "prefixUnit": "",
+                    "postfixUnit": "",
+                    "visible": true,
+                    "visible2": false,
+                    "availableValues": [
+                      {
+                        "name": "W",
+                        "value": "27",
+                        "label": "Watt (W) - Active Power Unit (27)"
+                      },
+                      {
+                        "name": "VA",
+                        "value": "28",
+                        "label": "Volt Ampere (VA) - Apparent Power Unit (28)"
+                      },
+                      {
+                        "name": "var",
+                        "value": "20",
+                        "label": "Volt Ampere Reactive (var) - Reactive Power Unit (20)"
+                      },
+                      {
+                        "name": "Wh",
+                        "value": "30",
+                        "label": "Watt hour (Wh) - Active Energy Unit (30)"
+                      },
+                      {
+                        "name": "VAh",
+                        "value": "31",
+                        "label": "Volt Ampere hour (VAh) - Apparent Energy Unit (31)"
+                      },
+                      {
+                        "name": "varh",
+                        "value": "32",
+                        "label": "Volt Ampere Reactive Hour (varh) - Reactive Energy Unit (32)"
+                      },
+                      {
+                        "name": "A",
+                        "value": "33",
+                        "label": "Ampere (A) - Current Unit (33)"
+                      },
+                      {
+                        "name": "V",
+                        "value": "35",
+                        "label": "Volt (V) - Voltage Unit (35)"
+                      },
+                      {
+                        "name": "Hz",
+                        "value": "44",
+                        "label": "Hertz (Hz) - Frequency Unit (44)"
+                      },
+                      {
+                        "name": "°C",
+                        "value": "9",
+                        "label": "Degree Celcius (°C) - Temperature Unit (9)"
+                      },
+                      {
+                        "name": "No Unit",
+                        "value": "255",
+                        "label": "No Unit, Unitless, Count (255)"
+                      }
+                    ],
+                    "enumGroup": "LPUnit",
+                    "name": "Unit",
+                    "dataType": "Unsigned",
+                    "size": 1,
+                    "readOnly": false,
+                    "value": ""
+                  },
+                  {
+                    "id": 3908,
+                    "displayDataType": "DropDownList",
+                    "min": "0",
+                    "max": "0",
+                    "prefixUnit": "",
+                    "postfixUnit": "",
+                    "visible": true,
+                    "visible2": true,
+                    "availableValues": [
+                      {
+                        "name": "Averaging",
+                        "value": "0",
+                        "label": ""
+                      },
+                      {
+                        "name": "Cumulative",
+                        "value": "1",
+                        "label": ""
+                      }
+                    ],
+                    "enumGroup": "LPWorkingMode",
+                    "name": "Working Mode",
+                    "dataType": "Enum",
+                    "size": 1,
+                    "readOnly": false,
+                    "value": ""
+                  }
+                ],
+                "value": ""
+              }
+            ],
+            "value": "Rule = Uniq[Register ID + Working Mode]"
+          }
+        ],
+        "value": {}
+      }
+    ],
+    "objectsRead": {
+      "dataType": "Structure",
+      "size": 0,
+      "success": true,
+      "value": [
+        {
+          "dataType": "LongUnsigned",
+          "size": 1,
+          "success": true,
+          "value": 20
+        },
+        {
+          "dataType": "Unsigned",
+          "size": 1,
+          "success": true,
+          "value": 0
+        },
+        {
+          "dataType": "Array",
+          "size": 1,
+          "success": true,
+          "value": [
+            {
+              "dataType": "Structure",
+              "size": 4,
+              "success": true,
+              "value": [
+                {
+                  "dataType": "Enum",
+                  "size": 1,
+                  "success": true,
+                  "value": 235
+                },
+                {
+                  "dataType": "Unsigned",
+                  "size": 1,
+                  "success": true,
+                  "value": 0
+                },
+                {
+                  "dataType": "Unsigned",
+                  "size": 1,
+                  "success": true,
+                  "value": 30
+                },
+                {
+                  "dataType": "Enum",
+                  "size": 1,
+                  "success": true,
+                  "value": 1
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,17 @@
+import { ActionResponseComponent } from './action-response.component';
+import { RouterModule, Routes } from '@angular/router';
+import { NgModule } from '@angular/core';
+
+const actionsRoutes: Routes = [
+    {
+        path: '', component: ActionResponseComponent, children: [
+            { path: ':id', component: ActionResponseComponent }
+        ]
+    },
+];
+
+@NgModule({
+    imports: [RouterModule.forChild(actionsRoutes)],
+    exports: [RouterModule]
+})
+export class ActionResponseRoutingModule { }

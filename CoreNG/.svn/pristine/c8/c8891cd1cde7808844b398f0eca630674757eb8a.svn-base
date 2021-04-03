@@ -1,0 +1,5 @@
+.table-tree-view {
+    line-height: 2em;
+    border-collapse: collapse;
+    border-spacing: 0;
+}

@@ -1,0 +1,19 @@
+<form nz-form [formGroup]="form" nzLayout="vertical">
+  <formly-form
+    [form]="form"
+    [fields]="fields"
+    [options]="options"
+    [model]="model"
+  ></formly-form>
+  <div *nzModalFooter>
+    <button nz-button nzType="default" (click)="handleCancel()">Cancel</button>
+    <button
+      nz-button
+      nzType="primary"
+      (click)="handleOk()"
+      [disabled]="form.invalid"
+    >
+      OK
+    </button>
+  </div>
+</form>

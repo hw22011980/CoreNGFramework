@@ -1,0 +1,204 @@
+import { Injectable } from '@angular/core';
+import { Router } from '@angular/router';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
+import { Observable } from 'rxjs';
+import { tap } from 'rxjs/operators';
+
+import { AccessToken } from './accesstoken.model';
+import { CoreService } from '../core/core.service';
+import { RequestCache } from '../core/interceptors/request-cache.service';
+import { DeviceCommActions } from '../devices/shared/device-comm-actions';
+import { StandardResponse } from '../standard-response/shared/standard-response.model';
+import { DeviceConnectStatus } from '../devices/shared/device-connect-status';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class AuthService {
+
+  isUserAuthenticated: boolean;
+  accessToken: AccessToken;
+  currentUser: string;
+  public tokenRequestUrl = this.coreService.getServerAddress() + 'token';
+  private emptyToken = {
+    access_token: '',
+    token_type: '',
+    expires_in: 0,
+    refresh_token: ''
+  };
+  devicePayload: String;
+
+  constructor(private httpClient: HttpClient,
+    private router: Router,
+    private coreService: CoreService,
+    private requestcache: RequestCache) { }
+
+  login(username: string, password: string): Observable<AccessToken> {
+    let headers = new HttpHeaders();
+    headers = headers.append('Login', 'true');
+
+    const body = 'username=' + username + '&password=' + password + '&grant_type=' + 'password';
+
+    return this.httpClient.post<AccessToken>(this.getTokenUrl(), body, { headers })
+      .pipe(
+        tap(data => {
+          this.setToken(data);
+          localStorage.setItem('currentUser', JSON.stringify(username));
+        })
+      );
+  }
+
+  readLicense(): Observable<any> {
+    let headers = new HttpHeaders();
+    headers = headers.append('Refresh', 'true');
+    headers = headers.append('Token', 'Bearer ' + this.getToken());
+    const options = { headers: headers };
+
+    return this.httpClient.get(this.getLicenseUrl(), options)
+      .pipe(
+        tap(data => {
+          console.log(data);
+        })
+      );
+  }
+
+  writeLicense(index: number, value: string): Observable<any> {
+    let headers = new HttpHeaders();
+    headers = headers.append('Refresh', 'true');
+    headers = headers.append('Token', 'Bearer ' + this.getToken());
+    const body = {
+      index: index,
+      value: value
+    };
+
+    return this.httpClient.post(this.getLicenseUrl(), body, { headers })
+      .pipe(
+        tap(data => {
+          console.log(data);
+        })
+      );
+  }
+
+  isAuthenticated() {
+    if (JSON.parse(localStorage.getItem('accessToken')) !== null) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  getToken() {
+    if (this.isAuthenticated()) {
+      return JSON.parse(localStorage.getItem('accessToken'));
+    } else {
+      return this.emptyToken;
+    }
+  }
+
+  initialize() {
+    this.isUserAuthenticated = false;
+    this.currentUser = '';
+    localStorage.clear();
+  }
+
+  setToken(accessToken: AccessToken) {
+    // save acces token to local storage instead of variable
+    const now = new Date().getTime();
+    const expires_in = (accessToken.expires_in - 5) * 1000;
+    const expiredTime = now + expires_in;
+    localStorage.setItem('accessToken', JSON.stringify(accessToken));
+    localStorage.setItem('expiredTime', expiredTime.toString());
+
+    this.isUserAuthenticated = true;
+  }
+
+  async checkToken() {
+    const now = new Date().getTime();
+    const expiredTime = Number(localStorage.getItem('expiredTime'));
+    if (expiredTime > now) {
+      await this.refreshToken().subscribe((token) => {
+        this.setToken(token);
+        return true;
+      });
+      return false;
+    } else {
+      return false;
+    }
+  }
+
+  logout() {
+    this.autoDisconnectLastConnection();
+    this.accessToken = this.emptyToken;
+    this.isUserAuthenticated = false;
+    console.log('user ' + this.getCurrentUser() + ' successfully logged out');
+    const error = localStorage.getItem('error');
+    localStorage.clear();
+    this.requestcache.clear();
+    localStorage.setItem('error', error);
+    this.router.navigate(['/login']);
+  }
+
+  license() {
+    this.router.navigate(['/license']);
+  }
+
+  private autoDisconnectLastConnection() {
+    if (localStorage.hasOwnProperty('previousId')) {
+      const connectstatus: DeviceConnectStatus = JSON.parse(localStorage.getItem('previousId'));
+
+      if (connectstatus.isConnected) {
+        let params = new HttpParams;
+        params = params.append('plantNumber', connectstatus.plantNumber);
+        this.sendPostRequest(true, params, 'disconnect').subscribe((response) => {
+          this.devicePayload = response.data;
+          if (response.success) {
+            connectstatus.isConnected = false;
+            localStorage.setItem('previousId', JSON.stringify(connectstatus));
+            console.log(JSON.stringify(connectstatus));
+          }
+        }, (error: any) => {
+          console.log(error);
+        });
+      }
+    }
+  }
+
+  private sendPostRequest(refresh = false, params = new HttpParams(), deviceAction = '') {
+    let headers = new HttpHeaders();
+    if (refresh) {
+      headers = headers.append('Refresh', 'true');
+    }
+    const options = { params: params, headers: headers };
+    const url = this.coreService.getServerAddress() + 'devices/' + deviceAction + '?' + params.toString();
+    return this.httpClient.post<StandardResponse>(url, null)
+      .pipe(
+        tap(data => {
+        })
+      );
+
+  }
+
+  getCurrentUser() {
+    return JSON.parse(localStorage.getItem('currentUser'));
+  }
+
+  refreshToken() {
+    const tokenRequestUrl = this.coreService.getServerAddress() + 'token';
+    const body = 'refresh_token=' + this.getToken().refresh_token + '&grant_type=' + 'refresh_token';
+
+    return this.httpClient.post<AccessToken>(tokenRequestUrl, body)
+      .pipe(
+        tap(data => {
+          this.setToken(data);
+        })
+      );
+  }
+
+  getTokenUrl() {
+    return this.coreService.getServerAddress() + 'token';
+  }
+
+  getLicenseUrl() {
+    return this.coreService.getServerAddress() + 'license';
+  }
+}

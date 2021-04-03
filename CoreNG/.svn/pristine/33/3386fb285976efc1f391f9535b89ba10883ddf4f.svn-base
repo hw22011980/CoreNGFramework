@@ -1,0 +1,9 @@
+.btnRight {
+    position: relative;
+    left: 80%;
+    top: 5px;
+}
+
+.btn {
+    border-radius: 25px;
+}

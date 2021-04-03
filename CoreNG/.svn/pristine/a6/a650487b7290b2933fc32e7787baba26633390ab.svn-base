@@ -1,0 +1,141 @@
+<div [formGroup]="formStage" > 
+  <div formArrayName="SubStageFormArray">
+    <div class="basic-stage">
+      <!-- Loop thro individual stages -->
+      <div *ngFor = 'let item of data; let idx = index'>
+        <div *ngIf='item.visible'>
+          
+          <!-- Numeric inputs -->
+          <div *ngIf="item.displayDataType=='NumericBox'">
+            <div class="mb-3">
+              <div class="input-group input-group-sm">
+                <div class="input-group-prepend">
+                  <span class="input-group-text justify-content-end" id="inputGroup-sizing-sm">{{item.name}}</span>
+                  <span *ngIf="item.prefixUnit != null && item.prefixUnit !=''" class="input-group-text justify-content-end input-prefix-text text-primary">{{item.prefixUnit}}</span>
+                </div>
+                <input type="text" id="txt{{idx}}" [readonly]="this.showEdit || this.loadbtnShow"  class="form-control" [formControlName]="idx" placeholder="enter value" (keypress)="numberOnly($event)" maxlength="{{item.max.length}}">
+                <div class="input-group-append">
+                  <span *ngIf="item.postfixUnit != null && item.postfixUnit !=''" class="input-group-text text-primary">{{item.postfixUnit}}</span>
+                </div>                  
+              </div>
+              <span *ngIf="!IsValidItem(idx)" class="inputError">{{lastError}}</span>
+            </div>
+          </div>
+          
+          <!-- Text inputs -->
+          <div *ngIf="item.displayDataType=='TextBox'">
+            <div class="mb-3">
+              <div class="input-group input-group-sm">
+                <div class="input-group-prepend">
+                  <span class="input-group-text justify-content-end" id="inputGroup-sizing-sm">{{item.name}}</span>
+                  <span *ngIf="item.prefixUnit != null && item.prefixUnit !=''" class="input-group-text justify-content-end input-prefix-text text-primary">{{item.prefixUnit}}</span>
+                </div>
+                <input type="text" id="txt{{idx}}"  [readonly]="item.readOnly || this.showEdit || this.loadbtnShow" class="form-control" [formControlName]="idx" placeholder="enter value">
+                <div class="input-group-append">
+                  <span *ngIf="item.postfixUnit != null && item.postfixUnit !=''" class="input-group-text text-primary">{{item.postfixUnit}}</span>
+                </div>
+              </div>
+              <span *ngIf="!IsValidItem(idx)" class="inputError">{{lastError}}</span>
+            </div>
+          </div>
+
+          <!-- Dropdown inputs -->
+          <div *ngIf="item.displayDataType=='DropDownList'">
+            <div class="mb-3">
+              <div class="input-group input-group-sm">
+                <div class="input-group-prepend">
+                  <span class="input-group-text justify-content-end" id="inputGroup-sizing-sm">{{item.name}}</span>
+                  <span *ngIf="item.prefixUnit != null && item.prefixUnit !=''" class="input-group-text justify-content-end input-prefix-text text-primary">{{item.prefixUnit}}</span>
+                </div>
+                <select *ngIf= "!(this.showEdit || this.loadbtnShow)" class="form-control" id="ddlist{{idx}}" [formControlName]="idx" >
+                  <option *ngFor="let opt of item.availableValues" [value]="opt.value">{{opt.name}}</option>
+                </select>
+                <select *ngIf= "(this.showEdit || this.loadbtnShow)" class="form-control" id="ddlist{{idx}}" value="{{item.value}}" [disabled]="true">
+                    <option *ngFor="let opt of item.availableValues" [value]="opt.value">{{opt.name}}</option>
+                </select>
+                <div class="input-group-append">
+                  <span *ngIf="item.postfixUnit != null && item.postfixUnit !=''" class="input-group-text text-primary">{{item.postfixUnit}}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Date inputs -->
+          <div *ngIf="item.displayDataType=='DateBox'">
+            <div class="mb-3">
+              <div class="input-group input-group-sm">
+                <div class="input-group-prepend">
+                  <span class="input-group-text justify-content-end" id="inputGroup-sizing-sm">{{item.name}}</span>
+                  <span *ngIf="item.prefixUnit != null && item.prefixUnit !=''" class="input-group-text justify-content-end input-prefix-text text-primary">{{item.prefixUnit}}</span>
+                </div>
+                <input class="form-control" placeholder="dd/mm/yyyy" name="dp{{idx}}" [formControlName]="idx" 
+                  ngbDatepicker #d="ngbDatepicker" [readonly]="item.readOnly || this.showEdit || this.loadbtnShow">
+                <div class="input-group-append">
+                  <button class="btn btn-outline-secondary" (click)="d.toggle()" [disabled]="item.readOnly || this.showEdit || this.loadbtnShow" type="button">
+                      <fa-icon [icon]="['far', 'calendar']"></fa-icon>
+                  </button>
+                  <span *ngIf="item.postfixUnit != null && item.postfixUnit !=''" class="input-group-text text-primary">{{item.postfixUnit}}</span>
+                </div>
+              </div>
+              <span *ngIf="!IsValidItem(idx)" class="inputError">{{lastError}}</span>
+            </div>
+          </div>
+
+          <!-- Time inputs -->
+          <div *ngIf="item.displayDataType=='TimeBox'">
+            <div class="mb-3">
+              <div class="input-group input-group-sm">
+                <div class="input-group-prepend">
+                  <span class="input-group-text justify-content-end" id="inputGroup-sizing-sm">{{item.name}}</span>
+                  <span *ngIf="item.prefixUnit != null && item.prefixUnit !=''" class="input-group-text justify-content-end input-prefix-text text-primary">{{item.prefixUnit}}</span>
+                </div>
+                <app-timepicker [formControlName]="idx" name="idx" [postfixUnit]="item.postfixUnit" [readonlyInputs]="this.showEdit|| this.loadbtnShow"></app-timepicker>
+              </div>
+              <span *ngIf="!IsValidItem(idx)" class="inputError">{{lastError}}</span>
+            </div>
+          </div>
+
+          <!-- Datetime inputs -->
+          <div *ngIf="item.displayDataType=='DateTimeBox'">
+            <div class="mb-3">
+              <div class="input-group input-group-sm">
+                <div class="input-group-prepend">
+                  <span class="input-group-text justify-content-end" id="inputGroup-sizing-sm">{{item.name}}</span>
+                  <span *ngIf="item.prefixUnit != null && item.prefixUnit !=''" class="input-group-text justify-content-end input-prefix-text text-primary">{{item.prefixUnit}}</span>
+                </div>
+                <app-datetimepicker [formControlName]="idx" name="idx" [postfix]="item.postfixUnit" [readonly]="item.readOnly || this.showEdit|| this.loadbtnShow" [className]="'datetime-group'"></app-datetimepicker>
+              </div>
+              <span *ngIf="!IsValidItem(idx)" class="inputError">{{lastError}}</span>
+            </div>
+          </div>
+
+          <!--Checkbox inputs -->
+          <div *ngIf="item.displayDataType=='CheckBox'">
+            <div class="mb-3">
+              <div class="input-group input-group-sm">
+                <div class="input-group-prepend">
+                  <span class="input-group-text justify-content-end" id="inputGroup-sizing-sm">{{item.name}}</span>
+                  <span *ngIf="item.prefixUnit != null && item.prefixUnit !=''" class="input-group-text justify-content-end input-prefix-text text-primary">{{item.prefixUnit}}</span>
+                </div>
+                <select *ngIf="!(this.showEdit || this.loadbtnShow)" class="form-control" id="ddlist{{idx}}" [formControlName]="idx" >
+                  <option [value]="0">False</option>
+                  <option [value]="1">True</option>
+                </select>
+                <select *ngIf="(this.showEdit || this.loadbtnShow)" class="form-control" id="ddlist{{idx}}" value="{{item.value}}" [disabled]="true">
+                  <option [value]="0">False</option>
+                  <option [value]="1">True</option>
+                </select>
+                <div class="input-group-append">
+                  <span *ngIf="item.postfixUnit != null && item.postfixUnit !=''" class="input-group-text text-primary">{{item.postfixUnit}}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- controls ends-->
+        </div> 
+      </div>
+      <!-- loop ends -->
+    </div>
+  </div>
+</div>

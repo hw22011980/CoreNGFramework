@@ -1,0 +1,59 @@
+.input-group>.input-group-prepend {
+    flex: 0 0 20%;
+}
+
+.input-group  {
+    width: auto;
+}
+.input-group .input-group-text {
+    width: 100%;
+}
+
+input[type="text"][disabled] {
+    background-color: #fcfcfc;
+    color:#6b6b6b;
+    font-weight: bold;
+ }
+
+select[disabled] {
+    background-color: #fcfcfc;
+    font-weight: bold;
+ }
+
+ input[type="text"] {
+    background-color: #fcfcfc;
+ }
+
+input.ng-invalid.ng-dirty:focus {
+    border-color: #dc3545 solid!important;
+    box-shadow: 0 0 0 0.2rem rgba(148, 86, 92, 0.25) !important;
+}
+
+input.ng-invalid.ng-dirty {
+    border: #dc3545 1px solid!important;
+}
+
+.ng-invalid.ng-dirty+.custom-file-label:focus{
+    border-color: #dc3545 !important;
+    box-shadow: 0 0 0 0.2rem rgba(148, 86, 92, 0.25) !important;
+}
+
+.ng-invalid.ng-dirty+.custom-file-label{
+    border: #dc3545 1px solid !important;
+    box-shadow: none !important;
+}
+
+small{
+    flex-wrap: wrap;
+    color:#dc3545;
+}
+
+.meter-image{
+    margin-bottom: 50px;
+    margin-left: 20px;
+}
+.btn 
+{
+  border-radius: 30px;
+  width: 85px;
+}

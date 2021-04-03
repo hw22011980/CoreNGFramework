@@ -1,0 +1,3 @@
+﻿@using CoreNG.API
+@namespace CoreNG.API.Pages
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers

@@ -1,0 +1,27 @@
+var replace = require('replace-in-file');
+var auroraVersion = process.argv[2];
+var mddcsVersion = process.argv[3];
+const optionsAuroraVersion = {
+  files: 'src/environments/environment.prod.ts',
+  from: auroraVersion,
+  to: '{AURORA_VERSION}',
+  allowEmptyPaths: false,
+};
+
+const optionsMddcsVersion = {
+  files: 'src/environments/environment.prod.ts',
+  from: mddcsVersion,
+  to: '{MDDCS_VERSION}',
+  allowEmptyPaths: false,
+};
+
+
+try {
+  replace.sync(optionsAuroraVersion);
+  console.log('Aurora build version reset successful: ' + auroraVersion);
+  replace.sync(optionsMddcsVersion);
+  console.log('Mddcs build version reset successful: ' + mddcsVersion); 
+}
+catch (error) {
+  console.error('Error occurred:', error);
+}

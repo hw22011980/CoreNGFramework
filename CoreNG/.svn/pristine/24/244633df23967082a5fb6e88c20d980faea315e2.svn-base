@@ -1,0 +1,34 @@
+import { Component, OnInit } from '@angular/core';
+import { DeviceService } from '../../devices/device.service';
+import { ActivatedRoute } from '@angular/router';
+import { SchedulesService } from '../schedules.service';
+import { Schedule } from '../shared/schedule.model';
+import { HttpParams } from '@angular/common/http';
+
+@Component({
+  selector: 'app-schedules-info',
+  templateUrl: './schedules-info.component.html',
+  styleUrls: ['./schedules-info.component.css']
+})
+export class SchedulesInfoComponent implements OnInit {
+
+  schedules: Schedule[];
+  schedule: Schedule;
+  scheduleExecutionJobId: number;
+  constructor(private scheduleService: SchedulesService, private activatedRoute: ActivatedRoute) { }
+
+  ngOnInit() {
+    this.scheduleExecutionJobId = Number(this.activatedRoute.snapshot.params['id']);
+    this.onGetSchedules();
+  }
+
+  onGetSchedules() {
+    let params = new HttpParams();
+    params = params.append('scheduleExecutionJobId', String(this.scheduleExecutionJobId));
+
+    this.scheduleService.getSchedulesService(true, params).subscribe((schedules) => {
+      this.schedule = schedules.schedules[0];
+    });
+    console.log(this.schedules);
+  }
+}

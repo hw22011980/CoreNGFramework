@@ -1,0 +1,4 @@
+.badge 
+{
+    border-radius: 30px;
+}

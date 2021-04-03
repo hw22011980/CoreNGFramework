@@ -1,0 +1,5 @@
+import {Schedule} from './schedule.model';
+
+export class Schedules {
+  schedules: Schedule[];
+}

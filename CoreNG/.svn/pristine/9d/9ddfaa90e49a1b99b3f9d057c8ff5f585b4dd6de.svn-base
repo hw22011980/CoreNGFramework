@@ -1,0 +1,7 @@
+import {KeyContent} from './key-content.model';
+
+export class DeviceDLMSKey {
+  plantNumber: string;
+  serialNumber: string;
+  keyContents: KeyContent[];
+}

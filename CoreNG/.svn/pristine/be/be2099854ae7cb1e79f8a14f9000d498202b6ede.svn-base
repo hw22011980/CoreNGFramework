@@ -1,0 +1,402 @@
+import { Component, OnInit, EventEmitter, Output } from '@angular/core';
+import { DeviceService } from '../device.service';
+import { SetupService } from '../setup.service';
+import { Devices } from '../shared/devices.model';
+import { ActivatedRoute } from '@angular/router';
+import { Device } from '../shared/device.model';
+import { HttpParams } from '@angular/common/http';
+import { InformationFields, InformationField, UpdateInformationFieldResult } from 'src/app/info-display/info-display.model';
+import { ToastrService } from 'ngx-toastr';
+import { DeviceRequest } from '../shared/device-request.model';
+import { DeviceRequestComms } from '../shared/device-comms-request.model';
+import { DeviceCommsFieldsTCPTCPDefinition } from './fields/device-info-comms-fields-tcp-tcp';
+import { DeviceInfoFieldsDefinition } from './fields/device-info-fields';
+import { FormGroup, FormArray, FormControl, Validators } from '@angular/forms';
+import { DeviceCommsFieldsHDLCSerialDefinition } from './fields/device-info-comms-fields-hdlc-serial';
+import { DeviceCommsFieldsHDLCTCPDefinition } from './fields/device-info-comms-fields-hdlc-tcp';
+import { PublishDetailsService } from 'src/app/services/publish-details.service';
+import { Envelop, EventMessage, ICrossComponentMsg } from 'src/app/common/cross-component-msg';
+
+@Component({
+  selector: 'app-device-info',
+  templateUrl: './device-info.component.html',
+  styleUrls: ['./device-info.component.css']
+})
+export class DeviceInfoComponent implements OnInit, ICrossComponentMsg {
+  devices: Devices;
+  device: Device;
+  devicePayload: DeviceRequest; // for update
+  deviceId: string;
+  infoModel: InformationFields = {};
+  infoFields: InformationField[] = [];
+  infoField: InformationField = {};
+  infoCommModel: InformationFields = {};
+  infoCommFields: InformationField[] = [];
+  infoCommField: InformationField = {};
+  formData: FormData;
+  actionResponse: any;
+  toastrId: number;
+  communicationProfileDictionary: any;
+  supportingLayerDictionary: any;
+  showSetupBtn: boolean;
+  envelop : Envelop;
+
+  deviceInfoFieldsDefinition: DeviceInfoFieldsDefinition = new DeviceInfoFieldsDefinition;
+  deviceCommsFieldsTCPTCPDefinition: DeviceCommsFieldsTCPTCPDefinition = new DeviceCommsFieldsTCPTCPDefinition;
+  deviceCommsFieldsHDLCSerialDefinition: DeviceCommsFieldsHDLCSerialDefinition = new DeviceCommsFieldsHDLCSerialDefinition;
+  deviceCommsFieldsHDLCTCPDefinition: DeviceCommsFieldsHDLCTCPDefinition = new DeviceCommsFieldsHDLCTCPDefinition;
+  updateCommsFormGroup: FormGroup;
+  edit = false;
+  @Output() deviceUpdatedEvent = new EventEmitter<Device>();
+
+  constructor(private deviceService: DeviceService,
+    private setupService: SetupService,
+    private activatedRoute: ActivatedRoute,
+    private toastrService: ToastrService,
+    private emitDetails: PublishDetailsService) {
+    this.setEnvelop();
+  }
+
+  ngOnInit() {
+    this.setEnvelop();
+    this.deviceId = this.activatedRoute.snapshot.params['id'];
+    this.toastrId = 4021;
+    this.onGetDevices();
+    this.updateCommsFormGroup = new FormGroup({
+      'deviceComms': new FormArray([])
+    });
+
+    this.showSetupBtn = true;
+    this.communicationProfileDictionary = this.deviceService.getDeviceCommunicationProfileDictionary();
+    this.supportingLayerDictionary = this.deviceService.getDeviceSupportingLayerDictionary();
+    this.envelop.set(new EventMessage('disableClick',this.showSetupBtn ));
+    this.emitDetails.messageEmitter.next(this.envelop);
+  }
+  setEnvelop()
+  {
+    this.envelop = new Envelop('DeviceNavigationComponent',
+    'DeviceInfoComponent','Send enable value to Device Navigation', null);
+  }
+  onSubscribedData(data)
+  {
+    
+  }
+
+  onGetDevices() {
+    // device-info and device-nav is async, so need implemented in both files
+    let params = new HttpParams();
+    params = params.append('deviceId', String(this.deviceId));
+
+    this.deviceService.getDevices(true, params).then((devices) => {
+      this.device = devices.devices[0];
+      this.envelop.set(new EventMessage('enableSetup',(this.device.numberofStages > 0)? true: false));
+      this.emitDetails.messageEmitter.next(this.envelop);
+      this.resetInformationDisplay();
+    },
+      (error: any) => {
+        this.showErrorToastr(error, 'Get Device Information');
+    });
+  }
+
+  getMeterImage() {
+    if (this.device != null) {
+      return './assets/images/meters/' + this.device.deviceType.deviceTypeName + '.png';
+    }
+  }
+
+  async onUpdateInformation(UpdateResults: UpdateInformationFieldResult[]) {
+    this.devicePayload = this.setDefaultValues();
+    for (let i = 0; i < UpdateResults.length; i++) {
+      this.devicePayload[UpdateResults[i].Name] = UpdateResults[i].Value;
+    }
+
+    this.deviceService.updateDeviceInformation(this.devicePayload).subscribe((StandardResponse) => {
+      this.device = StandardResponse.data;
+      localStorage.setItem('device', JSON.stringify(this.device));
+      this.envelop.set(new EventMessage('enableSetup',(this.device.numberofStages > 0)? true: false));
+      this.emitDetails.messageEmitter.next(this.envelop);
+      this.deviceUpdatedEvent.emit(this.device);
+  }, (error: any) => {
+      this.onGetDevices();
+      this.showErrorToastr(error, 'Device Information Update Failed');
+    },
+      () => {
+        this.showCompleteToastr('Device Information Update', 'Device Information Updated');
+        this.resetInformationDisplay();
+      }
+    );
+  }
+
+  onUpdateMeterCommInformation(event) {
+    this.devicePayload = this.setDefaultValues();
+    this.processUpdateDevice();
+    this.deviceService.updateDeviceInformation(this.devicePayload).subscribe((StandardResponse) => {
+      this.device = StandardResponse.data;
+      this.deviceUpdatedEvent.emit(this.device);
+    }, (error: any) => {
+      this.showErrorToastr(error, 'Device Comms Information Update Failed');
+      this.onGetDevices();
+    },
+      () => {
+        this.showCompleteToastr('Device Information Update', 'Device Comms Information Updated');
+        this.resetInformationDisplay();
+      });
+  }
+
+  setDefaultValues(): DeviceRequest {
+    this.devicePayload = new DeviceRequest;
+    this.devicePayload.DeviceId = this.device.deviceId;
+    this.devicePayload.SerialNumber = this.device.serialNumber;
+    this.devicePayload.PlantNumber = this.device.plantNumber;
+    // move to device-setup.components onUpdateInformation line 117
+    // localStorage.setItem('plantNumber', this.device.plantNumber);
+    this.devicePayload.SystemTitle = this.device.systemTitle;
+    this.devicePayload.DeviceStatus = this.device.deviceStatus.id.toString();
+    this.devicePayload.DeviceType = this.device.deviceType.deviceTypeId.toString();
+    this.devicePayload.DeviceModel = this.device.deviceModel.deviceModelID.toString();
+    this.devicePayload.SiteID = this.device.deviceSite.siteID;
+    this.devicePayload.FirmwareVersion = this.device.firmwareVersion;
+    this.devicePayload.NumberofStages = this.device.numberofStages;
+
+    this.devicePayload.DeviceComms = new DeviceRequestComms;
+    this.devicePayload.DeviceComms.CommunicationProfile = this.device.deviceComms.commsProfile;
+    this.devicePayload.DeviceComms.SupportingLayer = this.device.deviceComms.suppLayer;
+    this.devicePayload.DeviceComms.IECOpening = this.device.deviceComms.iecOpening;
+    this.devicePayload.DeviceComms.BaudRate = this.device.deviceComms.baudRate;
+    this.devicePayload.DeviceComms.Parity = this.device.deviceComms.parity;
+    this.devicePayload.DeviceComms.StopBits = this.device.deviceComms.stopBits;
+    this.devicePayload.DeviceComms.DataBits = this.device.deviceComms.dataBits;
+    this.devicePayload.DeviceComms.IPAddress = this.device.deviceComms.ipAddress == null ? '' : this.device.deviceComms.ipAddress;
+    this.devicePayload.DeviceComms.Port = this.device.deviceComms.port;
+    this.devicePayload.DeviceComms.Timeout = this.device.deviceComms.timeout;
+    this.devicePayload.DeviceComms.DLMSLogical = this.device.deviceComms.dlmsLogical;
+    this.devicePayload.DeviceComms.DLMSPhysical = this.device.deviceComms.dlmsPhysical;
+    this.devicePayload.DeviceComms.DLMSAddressScheme = this.device.deviceComms.dlmsAddressScheme;
+    this.devicePayload.DeviceComms.HDLCTimeout = this.device.deviceComms.hdlcTimeout;
+    this.devicePayload.DeviceComms.RetryTimeout = this.device.deviceComms.retryTimeout;
+
+    return this.devicePayload;
+  }
+
+  resetInformationDisplay() {
+    this.generateInfoComponent();
+    this.generateInfoCommunicationComponent(this.device.deviceComms.commsProfile, this.device.deviceComms.suppLayer);
+    this.resetFormArray(this.updateCommsFormGroup.get('deviceComms') as FormArray);
+    this.setFormGroup(this.infoCommFields, 'deviceComms');
+  }
+
+  generateInfoComponent() {
+    this.infoModel = {};
+    this.infoFields = [] = this.deviceInfoFieldsDefinition.getDeviceInfoFields(this.deviceService, this.device);
+    this.infoField = {};
+
+    this.infoModel.Editable = true;
+    this.infoModel.Header = 'DEVICE INFORMATION';
+
+    // meter image
+    this.infoModel.Image = true;
+    this.infoModel.ImageSrc = this.getMeterImage();
+
+    this.infoModel.InformationFields = this.infoFields;
+  }
+
+  generateInfoCommunicationComponent(communicationProfile: string, supportingLayer: string) {
+    this.infoCommFields = [];
+
+    this.infoCommModel.Editable = true;
+    this.infoCommModel.Header = 'DEVICE COMMUNICATION';
+
+    if (communicationProfile === this.communicationProfileDictionary['TCP']) {
+      this.infoCommFields = this.deviceCommsFieldsTCPTCPDefinition.getDeviceCommsFields(this.deviceService, this.device);
+    } else if (communicationProfile === this.communicationProfileDictionary['HDLC']) {
+      if (supportingLayer === this.supportingLayerDictionary['TCP']) {
+        this.infoCommFields = this.deviceCommsFieldsHDLCTCPDefinition.getDeviceCommsFields(this.deviceService, this.device);
+      } else if (supportingLayer === this.supportingLayerDictionary['Serial']) {
+        this.infoCommFields = this.deviceCommsFieldsHDLCSerialDefinition.getDeviceCommsFields(this.deviceService, this.device);
+      }
+    }
+  }
+
+  showErrorToastr(error: any, title: string) {
+    this.toastrService.remove(this.toastrId); // clean up first before showing another
+    this.toastrService.error(error.error.message, title, {
+      easeTime: 300,
+      timeOut: 10000,
+      closeButton: true,
+      tapToDismiss: false,
+      positionClass: 'toast-bottom-left'
+    });
+  }
+
+  showCompleteToastr(title: string, message: string) {
+    this.toastrService.success(message, title, {
+      enableHtml: true,
+      easeTime: 300,
+      timeOut: 10000,
+      closeButton: true,
+      tapToDismiss: false,
+      positionClass: 'toast-bottom-left'
+    });
+  }
+
+  KeepOrder() {
+    return 0;
+  }
+
+  setFormGroup(dictionaryInfo: InformationField[], formArrayName: string, editMode = false) {
+    for (let i = 0; i < dictionaryInfo.length; i++) {
+      if (dictionaryInfo[i].FieldType === 'Text' || dictionaryInfo[i].FieldType === 'Password') {
+        if (dictionaryInfo[i].Required) {
+          (<FormArray>this.updateCommsFormGroup.get(formArrayName))
+            .push(new FormControl({ value: dictionaryInfo[i].Value.toString(), disabled: editMode ? dictionaryInfo[i].Editable : true },
+              [Validators.required, Validators.maxLength(dictionaryInfo[i].MaxLength), this.WhitespaceValidator]));
+        } else {
+          (<FormArray>this.updateCommsFormGroup.get(formArrayName))
+            .push(new FormControl({ value: dictionaryInfo[i].Value.toString(), disabled: editMode ? dictionaryInfo[i].Editable : true },
+              Validators.maxLength(dictionaryInfo[i].MaxLength)));
+        }
+      }
+
+      if (dictionaryInfo[i].FieldType === 'IPAddress') {
+        if (dictionaryInfo[i].Required) {
+          (<FormArray>this.updateCommsFormGroup.get(formArrayName))
+            .push(new FormControl({ value: dictionaryInfo[i].Value.toString(), disabled: editMode ? !dictionaryInfo[i].Editable : true },
+              [Validators.required, Validators.maxLength(dictionaryInfo[i].MaxLength),
+              this.WhitespaceValidator, Validators.pattern(this.IpAddressValidator())]));
+        } else {
+          (<FormArray>this.updateCommsFormGroup.get(formArrayName))
+            .push(new FormControl({ value: dictionaryInfo[i].Value.toString(), disabled: editMode ? !dictionaryInfo[i].Editable : true },
+              [Validators.maxLength(dictionaryInfo[i].MaxLength), Validators.pattern(this.IpAddressValidator())]));
+        }
+      }
+
+      if (dictionaryInfo[i].FieldType === 'Number') {
+        if (dictionaryInfo[i].Required) {
+          (<FormArray>this.updateCommsFormGroup.get(formArrayName))
+            .push(new FormControl({ value: dictionaryInfo[i].Value.toString(), disabled: editMode ? !dictionaryInfo[i].Editable : true },
+              [Validators.required, Validators.pattern('^[0-9]*$'),
+              Validators.min(dictionaryInfo[i].MinLength), Validators.max(dictionaryInfo[i].MaxLength)]));
+        } else {
+          (<FormArray>this.updateCommsFormGroup.get(formArrayName))
+            .push(new FormControl({ value: dictionaryInfo[i].Value.toString(), disabled: editMode ? !dictionaryInfo[i].Editable : true },
+              [Validators.min(dictionaryInfo[i].MinLength), Validators.max(dictionaryInfo[i].MaxLength)]));
+        }
+      }
+
+      if (dictionaryInfo[i].FieldType === 'DropDown') {
+        (<FormArray>this.updateCommsFormGroup.get(formArrayName))
+          .push(new FormControl({ value: dictionaryInfo[i].Value.toString(), disabled: editMode ? !dictionaryInfo[i].Editable : true }));
+      }
+    }
+  }
+
+  public WhitespaceValidator(control: FormControl) {
+    const isWhitespace = (control.value || '').trim().length === 0;
+    const isValid = !isWhitespace;
+    return isValid ? null : { 'whitespace': true };
+  }
+
+  public IpAddressValidator(): RegExp {
+    // tslint:disable-next-line: max-line-length
+    return /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
+  }
+
+  onDeviceCommsChanges() {
+    const control = 'deviceComms';
+    this.updateCommsFormGroup.controls[control].get('0').
+      valueChanges.subscribe(data => {
+        this.generateInfoCommunicationComponent(
+          this.updateCommsFormGroup.controls[control].get('0').value.toString(),
+          this.updateCommsFormGroup.controls[control].get('1').value.toString());
+        this.resetFormArray(this.updateCommsFormGroup.get('deviceComms') as FormArray);
+        this.setFormGroup(this.infoCommFields, control, true);
+        this.onDeviceCommsChanges();
+      });
+
+    this.updateCommsFormGroup.controls[control].get('1').
+      valueChanges.subscribe(data => {
+        this.generateInfoCommunicationComponent(
+          this.updateCommsFormGroup.controls[control].get('0').value.toString(),
+          this.updateCommsFormGroup.controls[control].get('1').value.toString());
+        this.resetFormArray(this.updateCommsFormGroup.get('deviceComms') as FormArray);
+        this.setFormGroup(this.infoCommFields, control, true);
+        this.onDeviceCommsChanges();
+      });
+  }
+
+  onDropDownChange(param, value) {
+    console.log(param);
+    console.log(value);
+  }
+  resetFormArray(formArray: FormArray) {
+    while (formArray.length !== 0) {
+      formArray.removeAt(0);
+    }
+  }
+
+  enableEditableElements() {
+    for (const control in this.updateCommsFormGroup.controls) {
+      if (this.updateCommsFormGroup.controls.hasOwnProperty(control)) {
+        if (this.updateCommsFormGroup.get(control) instanceof FormArray) {
+          for (let i = 0; i < (<FormArray>this.updateCommsFormGroup.get(control)).controls.length; i++) {
+            if (this.infoCommFields[i].Editable) {
+              const ctrl = (<FormArray>this.updateCommsFormGroup.get(control)).controls[i];
+              ctrl.enable();
+            } else {
+              const ctrl = (<FormArray>this.updateCommsFormGroup.get(control)).controls[i];
+              ctrl.disable();
+            }
+          }
+        }
+      }
+    }
+    this.onDeviceCommsChanges();
+  }
+
+  processUpdateDevice() {
+    for (const control in this.updateCommsFormGroup.controls) {
+      if (this.updateCommsFormGroup.controls.hasOwnProperty(control)) {
+        if (this.updateCommsFormGroup.get(control) instanceof FormArray) {
+          for (let i = 0; i < (<FormArray>this.updateCommsFormGroup.get(control)).controls.length; i++) {
+            if (control === 'deviceComms') {
+              if (this.infoCommFields[i].Name in this.devicePayload.DeviceComms) {
+                this.devicePayload.DeviceComms[this.infoCommFields[i].Name] =
+                  (<FormArray>this.updateCommsFormGroup.get(control)).controls[i].value.trim();
+              }
+            }
+          }
+        }
+      }
+    }
+
+    // reset the form
+    this.resetInformationDisplay();
+  }
+
+  disable_invalid_characters(event, fieldType: string) {
+    const key = event.charCode;
+    if (fieldType === 'Text') {
+      return ((key > 47 && key < 58) || (key >= 65 && key <= 90) || (key >= 97 && key <= 122));
+    } else if (fieldType === 'Number') {
+      return ((key > 47 && key < 58));
+    }
+  }
+
+  public getErrorMessage(value, deviceInfo: any, index: number): String {
+    // invalid input is detected, return appropriate message
+    if (value === '') {
+      return deviceInfo[index].Description + ' cannot be blank';
+    } else if (value > deviceInfo[index].MaxLength && deviceInfo[index].FieldType === 'Number') {
+      return 'Value must not exceed ' + deviceInfo[index].MaxLength;
+    } else if (value < deviceInfo[index].MinLength && deviceInfo[index].FieldType === 'Number') {
+      return 'Value must not be less than ' + deviceInfo[index].MinLength;
+    } else if (deviceInfo[index].FieldType === 'IPAddress') {
+      return deviceInfo[index].Description + ' is in invalid format ';
+    } else if (deviceInfo[index].FieldType === 'Text' && !deviceInfo[index].AlphaNumeric) {
+      return 'Value contains invalid characters. Valid characters are: A-Z a-z 0-9 - _';
+    } else if (deviceInfo[index].FieldType === 'Text' && deviceInfo[index].AlphaNumeric) {
+      return 'Value contains invalid characters. Valid characters are: A-Z a-z 0-9';
+    }
+    return deviceInfo[index].Description + ' is invalid';
+  }
+}

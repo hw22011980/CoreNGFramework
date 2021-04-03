@@ -1,0 +1,17 @@
+.btn-delete {
+    background-color: #700c0e;
+    color: white;
+}
+
+.pointer {
+    cursor: pointer;
+}
+
+.btn
+{
+    border-radius: 30px;
+}
+
+.table-width {
+    width: 92%;
+}

@@ -1,0 +1,707 @@
+import { Component, OnInit, AfterViewInit, ViewChild, Input, OnDestroy, Output } from '@angular/core';
+import { trigger, state, style, transition, animate } from '@angular/animations';
+import { HttpClient } from '@angular/common/http';
+import { DeviceService } from '../device.service';
+import { SetupService } from '../setup.service';
+import { ActivatedRoute, ActivatedRouteSnapshot, Router, RouterStateSnapshot } from '@angular/router';
+import { StageViewCollection } from '../../stages/stage.factories';
+import { FormConfig } from '../../stages/stage.config';
+import { FormComponent } from '../../stages/stage.base';
+import { PublishDetailsService } from 'src/app/services/publish-details.service';
+import { InterComponentDataService } from 'src/app/services/intercomponent-data-service';
+import { Subscription, Observable, of } from 'rxjs';
+import { StageNotification } from 'src/app/stages/stage.notification';
+import { ComponentCanDeactivate } from 'src/app/core/can-deactivate/component-can-deactivate';
+import { ToastrService } from 'ngx-toastr';
+import { NavTreeComponent } from 'src/app/core/component/nav-tree/nav-tree.component';
+import { Device } from '../shared/device.model';
+import { DeviceConnectStatus } from '../shared/device-connect-status';
+import { faFolderOpen, faFolder } from '@fortawesome/free-regular-svg-icons';
+import { IconDefinition } from '@fortawesome/fontawesome-svg-core';
+import { faChevronDown, faChevronUp, faAngleDoubleDown, faAngleDoubleUp, faTools, faWrench, faCog } from '@fortawesome/free-solid-svg-icons';
+import { LoaderConnectService } from 'src/app/services/loader-connect-service.component';
+import { Envelop, EventMessage, ICrossComponentMsg, NavIdentification, NavTreeNodeStatus, SelectedStage } from 'src/app/common/cross-component-msg';
+import { CompareSetupComponent } from 'src/app/stages/compare-setup/compare-setup.component';
+import { EventEmitter } from 'events';
+
+
+
+@Component({
+  selector: 'app-device-setup',
+  templateUrl: './device-setup.component.html',
+  styleUrls: ['./device-setup.component.css'],
+  animations: [
+    trigger('slideInOut', [
+      state('in', style({
+        transform: 'translate3d(0, 0, 0)'
+      })),
+      state('out', style({
+        transform: 'translate3d(100%, 0, 0)'
+      })),
+      transition('in => out', animate('400ms ease-in-out')),
+      transition('out => in', animate('400ms ease-in-out'))
+    ])
+  ]
+
+})
+export class DeviceSetupComponent extends StageNotification implements OnInit,
+  OnDestroy, AfterViewInit, ComponentCanDeactivate, ICrossComponentMsg {
+  @ViewChild(FormComponent) child: FormComponent;
+  @ViewChild('navtree') navTreeComponent: NavTreeComponent;
+  @ViewChild('compareSetup') compareSetup: CompareSetupComponent;
+
+  @Input()
+  public openedFolderIcon: IconDefinition = faFolderOpen;
+
+  @Input()
+  public closedFolderIcon: IconDefinition = faFolder;
+
+
+
+  frmConfig: FormConfig;
+  title; string;
+
+  menus: any;
+  device: Device;
+
+  disableClick = true;
+  xComponentSubscription: Subscription;
+  toolState = 'in';
+  milestone = { status: 'checked' };
+  enableCheckBox = true;
+  isCollapse = false;
+  isCompareModalOpen = false;
+  isProgressbarModalOpen = false;
+
+  NodesLastState: NavTreeNodeStatus;
+  NodesCount = 0;
+
+  chevronDownIcon = faChevronDown;
+  chevronUpIcon = faChevronUp;
+
+  angleDoubleDownIcon = faAngleDoubleDown;
+  angleDoubleUpIcon = faAngleDoubleUp;
+  toolsIcon = faTools;
+  toolsWrench = faWrench;
+  toolsCog = faCog;
+
+  parentNodeStatus: any = [];
+  selectedMenuIds: any = [];
+
+  childNodes: NavTreeNodeStatus;
+  initParentNodeOnce = false;
+  private selectedStage: SelectedStage = null;
+  envelop: Envelop;
+  toolsSlideInOffline = false;
+
+  isProcessing: boolean;
+
+  constructor(public http: HttpClient,
+
+    public stageViewCollection: StageViewCollection,
+    public deviceService: DeviceService,
+    public setupService: SetupService,
+    public activatedRoute: ActivatedRoute,
+    private emitDetails: PublishDetailsService,
+    private router: Router,
+    private interComponentData: InterComponentDataService<any>,
+    public toastrService: ToastrService,
+    public loader: LoaderConnectService) {
+    super(toastrService);
+    this.setEnvelop(null);
+  }
+
+  ngOnInit() {
+    this.childNodes = new NavTreeNodeStatus();
+    this.enableCheckBox = false;
+    this.toolsSlideInOffline = false;
+    this.toolState = 'in';
+    this.setEnvelop(null);
+    let deviceId = this.getResolvedUrl(this.activatedRoute.snapshot);
+    deviceId = deviceId.replace('/devices//', '');
+    deviceId = deviceId.replace('/setup', '');
+    this.onGetDevices(deviceId);
+    this.xComponentSubscription = this.emitDetails.messageEmitter.subscribe(data => this.onSubscribedData(data));
+
+    this.isProcessing = false;
+
+    if (localStorage.hasOwnProperty('previousId')) {
+      const connectstatus: DeviceConnectStatus = JSON.parse(localStorage.getItem('previousId'));
+      this.enableCheckBox = connectstatus.isConnected;
+
+    } else
+      this.enableCheckBox = false;
+
+    if ((this.toolState === 'in') && (!this.enableCheckBox)) {
+      this.toolsSlideInOffline = true;
+      this.envelop.set(new EventMessage('toolsSlideInOffline', this.toolsSlideInOffline));
+      this.emitDetails.messageEmitter.next(this.envelop);
+    }
+  }
+  ngOnDestroy() {
+    this.xComponentSubscription.unsubscribe();
+  }
+
+  setEnvelop(data) {
+    this.envelop = new Envelop('DeviceNavigationComponent',
+      'DeviceSetupComponent', 'Send selected status to navigation bar', data);
+  }
+
+
+  onSubscribedData(data: any) {
+    if (data instanceof Envelop) {
+      const tempdata = data as Envelop;
+      switch (tempdata.from) {
+        case 'AppComponent':
+          this.ngOnInit();
+          if (tempdata.get() instanceof NavIdentification) {
+            const navid = tempdata.get() as NavIdentification;
+            this.onNavigationEvents(navid);
+          }
+          break;
+
+        case 'NavTreeComponent':
+          {
+            if (tempdata.get() instanceof SelectedStage) {
+              if (this.interComponentData.GetItemValue('refreshPage')) {
+                this.refreshMenu(tempdata.get() as SelectedStage);
+              }
+            }
+            if (tempdata.get() instanceof NavTreeNodeStatus) {
+              this.milestone.status = (tempdata.get() as NavTreeNodeStatus).ChkMilestone;
+            }
+          }
+          break;
+        case 'ToolsComponent':
+          if (tempdata.get() instanceof EventMessage) {
+            const status = tempdata.get() as EventMessage;
+            switch (status.EventName) {
+              case 'disableClick':
+                this.disableClick = status.Value;
+                break;
+              case 'updateNavTree':
+                this.updateMainCheckBox(status.Value);
+                break;
+              case 'isCollapse':
+                this.isCollapse = status.Value;
+                break;
+            }
+
+          }
+          break;
+        case 'DeviceNavigationComponent':
+          {
+            if (tempdata.get() instanceof DeviceConnectStatus) {
+
+              const status = tempdata.get() as DeviceConnectStatus;
+              if (!status.isConnected) {
+                this.isCollapse = false;
+              }
+              else {
+                if (this.isCollapse) {
+                  this.isCollapse = false;
+                }
+              }
+              this.enableCheckBox = status.isConnected;
+            }
+            if (tempdata.get() instanceof SelectedStage) {
+              if (this.interComponentData.GetItemValue('refreshPage')) {
+                this.refreshMenu(tempdata.get() as SelectedStage);
+              }
+            }
+            if (tempdata.get() instanceof EventMessage) {
+              const event = tempdata.get() as EventMessage;
+
+              switch (event.EventName) {
+                case 'disableClick':
+                  this.disableClick = event.Value;
+                  if (this.disableClick && this.toolState === 'in') {
+                    this.toolState = 'out';
+                  }
+                  break;
+                case 'updateNavTree':
+                  this.updateMainCheckBox(event.Value);
+                  break;
+                case 'toolsSlideInOffline':
+                  this.toolsSlideInOffline = event.Value;
+                  break;
+                case 'isCollapse':
+                  this.isCollapse = event.Value;
+                  break;
+              }
+
+            }
+          }
+          break;
+
+        case 'StageTableComponent':
+        case 'StageBasicComponent':
+        case 'DisplayProfileComponent':
+          {
+            const event = tempdata.get() as EventMessage;
+            if (event.EventName === 'disableClick') {
+              this.disableClick = event.Value;
+              if (this.disableClick && this.toolState === 'in') {
+                this.toolState = 'out';
+              }
+
+            }
+          }
+          break;
+        default:
+          break;
+      }
+    }
+  }
+
+  onGetDevices(deviceId: string) {
+    const device = this.deviceService.getSelectedDevice(deviceId);
+    this.device = device;
+    if (device != null) {
+      this.frmConfig = {
+        'id': '0',
+        'deviceId': deviceId,
+        'title': '',
+        'url': '',
+        'form': ''
+      };
+
+      const strmenu = localStorage.getItem('menu');
+      const objmenu = JSON.parse(strmenu);
+      this.childNodes.CheckedStageIDArray = [];
+      this.parentNodeStatus = [];
+      if (objmenu !== null) {
+        this.menus = objmenu.menu;
+        if (!this.initParentNodeOnce) {
+          this.menus.forEach(element => {
+            this.parentNodeStatus.push({ key: element.id, value: 'checked' });
+            element.children.forEach(child => {
+              child.id
+              this.childNodes.CheckedStageIDArray.push(child.id)
+            });
+
+          });
+          this.initParentNodeOnce = true;
+        }
+      }
+    }
+  }
+
+
+  private updateMainCheckBox(menu: any) {
+    if (menu !== null) {
+
+      var parentCount = 0;
+      menu.forEach(parent => {
+        let count = 0
+        parentCount += parent.selected == 1 ? 1 : 0
+        parent.children.forEach(child => {
+          count += child.selected ? 1 : 0;
+        });
+        if (count == 0)
+          this.parentNodeStatus.find(item => item.key == parent.id).value = 'unchecked';
+        else if (count < parent.children.length)
+          this.parentNodeStatus.find(item => item.key == parent.id).value = 'crossed';
+        else
+          this.parentNodeStatus.find(item => item.key == parent.id).value = 'checked';
+      });
+      if (parentCount < menu.length) this.milestone.status = 'crossed';
+      if (parentCount == menu.length) this.milestone.status = 'checked';
+    }
+  }
+
+  onSaveCompareSetup() {
+    this.compareSetup.disabledBtn = true;
+    this.setupService.WriteCompareSetup(this.compareSetup.output_data).subscribe(
+      data => {
+        this.isCompareModalOpen = false;
+        this.reEnableSetup();
+        this.showSuccessToast('Compare values has been written successfully.');
+      },
+      (error) => {
+        this.isCompareModalOpen = false;
+        this.reEnableSetup();
+        this.showErrorToast(error.message);
+      }
+    );
+  }
+
+  onCancelCompareSetup() {
+    this.reEnableSetup()
+  }
+
+  private reEnableSetup() {
+    if (!this.disableClick) {
+      this.disableClick = true;
+      this.envelop.set(new EventMessage('disableClick', this.disableClick));
+      this.emitDetails.messageEmitter.next(this.envelop);
+    }
+  }
+
+  private onNavigationEvents(value: NavIdentification) {
+    // let data: SelectedStage;
+    // tslint:disable-next-line: no-use-before-declare
+    const data = new SelectedStage();
+    this.constructSelectedStage(data, value.Name);
+
+    this.refreshMenu(data);
+    this.envelop.set(data);
+    this.emitDetails.messageEmitter.next(this.envelop);
+
+    // As per stand-up 8/27/20 10am this needs to be put into known issues,
+    // user wont be warn when leaving the page using back/forward browser buttons
+    // let index = this.router.url.lastIndexOf('/')+1;
+    // let currSetup = this.router.url.substring(index);
+    // let menu = this.navTreeComponent.getStageNode(currSetup);
+    // if(menu!=null)
+    // {
+    //    this.clickMenu(menu);
+    // }
+
+  }
+
+  private constructSelectedStage(data: SelectedStage, stageName: string) {
+
+    const params = this.navTreeComponent.getNodeDetails(stageName);
+
+    if (params.size === 0) {
+      data.StageId = '';
+      data.SetupId = '';
+      data.StageName = '';
+      data.SetupName = '';
+    } else {
+      if (params.has('child')) {
+        data.StageId = params.get('parent').get('stageid');
+        data.SetupId = params.get('child').get('setupid');
+        data.StageName = params.get('parent').get('stagename');
+        data.SetupName = params.get('child').get('setupname');
+      } else {
+        data.StageId = params.get('parent').get('stageid');
+        data.SetupId = '';
+        data.StageName = params.get('parent').get('stagename');
+        data.SetupName = '';
+
+      }
+    }
+  }
+
+  checkMilestone(milestone) {
+    // process select all events and send to nav-tree
+    switch (milestone.status) {
+      case 'checked': {
+        milestone.status = 'unchecked';
+        this.menus.forEach(menu => {
+          this.parentNodeStatus.forEach(element => {
+            if (element.key === menu.id) {
+              element.value = 'unchecked';
+            }
+          });
+        });
+        this.envelop.set(new EventMessage('selectAll', 'unchecked'));
+        this.emitDetails.messageEmitter.next(this.envelop);
+
+        let tempdata = new NavTreeNodeStatus();
+        tempdata.CheckedStageIDArray = [];
+        this.envelop.set(tempdata);
+        this.emitDetails.messageEmitter.next(this.envelop);
+        break;
+      }
+      case 'unchecked': {
+        milestone.status = 'checked';
+        this.menus.forEach(menu => {
+          this.parentNodeStatus.forEach(element => {
+            if (element.key === menu.id) { element.value = 'checked'; }
+          });
+        });
+        this.envelop.set(new EventMessage('selectAll', 'checked'));
+        this.emitDetails.messageEmitter.next(this.envelop);
+        this.envelop.set(this.childNodes);
+        this.emitDetails.messageEmitter.next(this.envelop);
+        break;
+      }
+      case 'crossed': {
+        milestone.status = 'checked';
+        this.menus.forEach(menu => {
+          this.parentNodeStatus.forEach(element => {
+            if (element.key === menu.id) { element.value = 'checked'; }
+          });
+        });
+        this.envelop.set(new EventMessage('selectAll', 'checked'));
+        this.emitDetails.messageEmitter.next(this.envelop);
+        this.envelop.set(this.childNodes);
+        this.emitDetails.messageEmitter.next(this.envelop);
+        break;
+      }
+    }
+  }
+
+  getMeterImage() {
+
+    return './assets/images/meters/' + localStorage.getItem('deviceTypeName') + '.png';
+  }
+  OnClickFolderIcon() {
+    //process collapse all events and send to nav-tree
+    this.isCollapse = !this.isCollapse;
+    this.envelop.set(new EventMessage('openFolder', this.isCollapse));
+    this.emitDetails.messageEmitter.next(this.envelop);
+  }
+  onNavTreeData(data: any) {
+    this.NodesLastState = data;
+  }
+
+  onParenNodesCheck(data: any) {
+    const status = data as NavTreeNodeStatus;
+
+    this.envelop.set(data);
+    this.emitDetails.messageEmitter.next(this.envelop);
+
+    this.parentNodeStatus.forEach(element => {
+      if (element.key === status.NodeId) { element.value = status.NodeCheckStatus; }
+    });
+
+    let counta = 0, countb = 0;
+    this.parentNodeStatus.forEach(element => {
+      if (element.value === 'checked') { counta++; }
+      if (element.value === 'unchecked') { countb++; }
+    });
+    if (countb === this.menus.length) {
+      this.milestone.status = 'unchecked';
+    }
+    else {
+      if (counta !== this.menus.length) {
+        this.milestone.status = 'crossed';
+      }
+      else { this.milestone.status = 'checked'; }
+    }
+  }
+
+  clickMenu(menu: any) {
+
+    this.isCollapse = !this.NodesLastState.AllNodesClosed;
+    let hasEditedDataDifference = false;
+
+    if (this.frmConfig && this.child.isEditing) {
+      hasEditedDataDifference = this.child.hasEditedDataDifference();
+    }
+
+    if (this.frmConfig && this.child.isEditing && hasEditedDataDifference) {
+      this.showConfirmToast('You are editing a stage. If you leave, your changes will be lost. Leave?').onAction.subscribe(x => {
+        if (x.title === 'Yes') {
+          this.showStageView(menu);
+
+        } else {
+          this.reloadMenu();
+          return;
+
+        }
+      });
+
+    } else {
+      this.showStageView(menu);
+    }
+  }
+
+
+  showStageView(menu: Menu) {
+    if (menu.uiTemplate === -1) {
+      this.processRootStage(menu);
+    } else {
+      this.processFrmConfig(menu);
+    }
+  }
+
+  private setFrmConfig(menu: Menu, isStageView: boolean) {
+    const strdevice = localStorage.getItem('device');
+    const device = JSON.parse(strdevice);
+
+    let frmCofigJson: FormConfig;
+    if (menu != null) {
+      frmCofigJson = {
+        'id': menu.id,
+        'deviceId': device.deviceId,
+        'title': menu.name,
+        'url': menu.url,
+        'form': isStageView ? this.stageViewCollection.getForms(menu.uiTemplate) : ''
+      };
+    } else {
+      frmCofigJson = { 'id': '0', 'deviceId': device.deviceId, 'title': '', 'url': '', 'form': '' };
+    }
+    if (!this.interComponentData.ContainsKey('LastLoadedPage')) {
+      this.interComponentData.AddItem('LastLoadedPage', frmCofigJson);
+    } else {
+      this.interComponentData.SetItemValue('LastLoadedPage', frmCofigJson);
+    }
+
+    this.frmConfig = frmCofigJson;
+  }
+
+
+  private processFrmConfig(menu: Menu) {
+    this.setFrmConfig(menu, true);
+
+    this.menus.forEach((stage) => {
+
+
+      stage.children.forEach((setup) => {
+        if (setup.name === menu.name) {
+          this.selectedStage = new SelectedStage(stage.name, menu.name, stage.id, menu.id);
+          if (!this.interComponentData.ContainsKey('refreshPage')) {
+            this.interComponentData.AddItem('refreshPage', false);
+          } else {
+            this.interComponentData.SetItemValue('refreshPage', false);
+          }
+          this.envelop.set(this.selectedStage);
+          this.emitDetails.messageEmitter.next(this.envelop);
+
+          const route = `/devices/${this.frmConfig.deviceId}/setup/${stage.name}/${menu.name.replace('/', '')}`;
+
+          this.router.navigate([route]);
+          return;
+        }
+      });
+    });
+  }
+
+  private getResolvedUrl(route: ActivatedRouteSnapshot): string {
+    return route.pathFromRoot
+      .map(v => v.url.map(segment => segment.toString()).join('/'))
+      .join('/');
+  }
+
+
+  private processRootStage(stageName: any) {
+    this.setFrmConfig(stageName, false);
+    this.selectedStage = new SelectedStage(stageName.name, '', stageName.id, '');
+
+    if (!this.interComponentData.ContainsKey('refreshPage')) {
+      this.interComponentData.AddItem('refreshPage', false);
+    } else {
+      this.interComponentData.SetItemValue('refreshPage', false);
+    }
+    this.envelop.set(this.selectedStage);
+    this.emitDetails.messageEmitter.next(this.envelop);
+
+
+    const route = `/devices/${this.frmConfig.deviceId}/setup/${stageName.name}`;
+    this.router.navigate([route]);
+  }
+
+
+  public refreshMenu(stage: any) {
+    if (stage.SetupId === '' && stage.StageId === '') {
+      this.navTreeComponent.changeDataByNodeId(stage.SetupId, stage.StageId);
+
+    } else if (stage.SetupId === '' && stage.StageId !== '') {
+
+      this.navTreeComponent.changeDataByNodeId('', stage.StageId);
+
+    } else if (stage.SetupId !== '' && stage.StageId !== '') {
+      this.navTreeComponent.changeDataByNodeId(stage.SetupId, stage.StageId);
+    }
+
+    const currentMenu: Menu = this.navTreeComponent.node;
+    if (currentMenu !== null) {
+      this.setFrmConfig(currentMenu, currentMenu.uiTemplate !== -1);
+    }
+  }
+
+
+  private reloadMenu() {
+    if (this.selectedStage.SetupId === '') {
+      this.navTreeComponent.changeDataByNodeId(this.selectedStage.StageId, '');
+    } else {
+      this.navTreeComponent.changeDataByNodeId(this.selectedStage.SetupId, this.selectedStage.StageId);
+    }
+  }
+
+
+  ngAfterViewInit(): void {
+
+  }
+
+
+  canDeactivate(nextState?: RouterStateSnapshot): Observable<boolean> | Promise<boolean> | boolean {
+    let hasEditedDataDifference = false;
+    if (this.frmConfig && this.child.isEditing) {
+      hasEditedDataDifference = this.child.hasEditedDataDifference();
+    }
+
+    if (this.frmConfig && this.child.isEditing && hasEditedDataDifference) {
+      this.showConfirmToast('You are editing a stage. If you leave, your changes will be lost. Leave?').onAction.subscribe(x => {
+        if (x.title === 'Yes') {
+          const queryParams = nextState.root.queryParams;
+          this.router.navigate([nextState.url.split('?')[0]],
+            {
+              queryParams
+            });
+          this.child.isEditing = false;
+        } else {
+          return;
+        }
+
+      });
+
+    } else {
+      return true;
+    }
+  }
+
+  toggleTools() {
+    this.toolState = this.toolState === 'out' ? 'in' : 'out';
+    if (!this.enableCheckBox) {
+      if (this.toolState === 'in')
+        this.toolsSlideInOffline = true;
+      else {
+        this.toolsSlideInOffline = false;
+        this.isCollapse = false;
+        this.envelop.set(new EventMessage('openFolder', this.isCollapse));
+        this.emitDetails.messageEmitter.next(this.envelop);
+      }
+    }
+    this.envelop.set(new EventMessage('toolsSlideInOffline', this.toolsSlideInOffline));
+    this.emitDetails.messageEmitter.next(this.envelop);
+  }
+
+  onToolClicked(data: { status: number, loading: boolean, ids: any }) {
+    switch (data.status) {
+      case 1:
+      case 2:
+        this.isCompareModalOpen = false;
+        this.isProgressbarModalOpen = true;
+        this.selectedMenuIds = data.ids;
+        break;
+      case 3:
+        this.isCompareModalOpen = true;
+        this.isProgressbarModalOpen = false;
+        this.selectedMenuIds = data.ids;
+        break;
+      default:
+        break;
+    }
+  }
+
+  collapseAllTreeTable() {
+    this.compareSetup.collapseAll();
+  }
+
+  expandAllTreeTable() {
+    this.compareSetup.expandAll();
+  }
+}
+
+export class Menu {
+  id: string;
+  name: string;
+  url: string;
+  uiTemplate: number;
+  enable: boolean;
+  visible: boolean;
+  children: Menu[];
+}
+
+
+
+
+
+
+

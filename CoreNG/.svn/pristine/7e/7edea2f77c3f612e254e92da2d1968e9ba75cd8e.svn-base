@@ -1,0 +1,124 @@
+/* This unit is based on the height of the viewport. 
+A value of 1vh is equal to 1% of the viewport height. */
+
+#setup-content>.row {
+    min-height: 58vh;
+}
+
+#column-pills-tab {
+    /* background-color: darkgray; */
+    background-color: #E9ECEF;
+}
+
+.d-flex {
+    height: 20px;
+}
+
+.btn {
+    font-size: 16px;
+    margin-top: -8px;
+    margin-right: -5px;
+}
+
+.btn-link {
+    color: white !important
+}
+
+.btn-link:hover {
+    color: lightgrey !important
+}
+
+.fa-gear {
+    font-size: 15px;
+    margin-right: 3px;
+}
+
+.card {
+    overflow-x: hidden;
+}
+
+.col-3, .col-9 {
+    max-height: 6in;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+/* .card-header 
+{   
+max-height: 7in;
+overflow-y: auto;
+overflow-x: hidden;
+} */
+
+#devStages {
+    padding-left: 10px;
+}
+
+input[type=checkbox] {
+    margin-top: 5px;
+    margin-right: 11px;
+    transform: scale(1.112);
+}
+
+.icon {
+    color: white;
+    transform: scale(1.25);
+}
+
+#custom {
+    width: 5px;
+    height: 5px;
+}
+
+.icon:hover {
+    color: rgb(0, 123, 255);
+}
+
+.disabled {
+    opacity: 0.5;
+    pointer-events: none;
+    cursor: not-allowed;
+}
+
+.hide {
+    display: none;
+}
+
+.full-modal {
+    max-height: 100% !important;
+}
+
+.full_modal-dialog {
+    width: 98% !important;
+    height: 98% !important;
+    min-width: 98% !important;
+    min-height: 98% !important;
+    max-width: 98% !important;
+    max-height: 98% !important;
+    padding: 0 !important;
+}
+
+.full_modal-content {
+    height: 99% !important;
+    min-height: 99% !important;
+    max-height: 99% !important;
+}
+
+.modal-body {
+    overflow-y: auto;
+}
+
+.btn {
+    border-radius: 30px;
+}
+
+.btn-delete {
+    background-color: #700c0e;
+    color: white;
+}
+
+.center {
+    margin-top: 10%;
+    display: flex;
+    justify-content: center;
+}

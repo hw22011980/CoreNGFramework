@@ -1,0 +1,145 @@
+{
+  "success": true,
+  "code": 0,
+  "message": "Get Metadata and Value from Meter 'HY_10X' By Param ID = 9 in 187ms",
+  "plantNumber": "HY_10X",
+  "data": {
+    "id": "9",
+    "name": "CT/VT Ratios",
+    "message": "",
+    "size": 4,
+    "readOnly": false,
+    "items": [
+      {
+        "id": 19,
+        "displayDataType": "NumericBox",
+        "min": "1",
+        "max": "45000",
+        "prefixUnit": "",
+        "postfixUnit": "",
+        "visible": true,
+        "visible2": false,
+        "availableValues": [
+          {
+            "name": "1",
+            "value": "1"
+          },
+          {
+            "name": "45000",
+            "value": "45000"
+          }
+        ],
+        "enumGroup": "",
+        "name": "CT Numerator",
+        "dataType": "LongUnsigned",
+        "size": 4,
+        "readOnly": false,
+        "value": "1"
+      },
+      {
+        "id": 20,
+        "displayDataType": "NumericBox",
+        "min": "1",
+        "max": "10",
+        "prefixUnit": "",
+        "postfixUnit": "",
+        "visible": true,
+        "visible2": false,
+        "availableValues": [
+          {
+            "name": "1",
+            "value": "1"
+          },
+          {
+            "name": "10",
+            "value": "10"
+          }
+        ],
+        "enumGroup": "",
+        "name": "CT Denominator",
+        "dataType": "Unsigned",
+        "size": 4,
+        "readOnly": false,
+        "value": "1"
+      },
+      {
+        "id": 21,
+        "displayDataType": "NumericBox",
+        "min": "1",
+        "max": "800000",
+        "prefixUnit": "",
+        "postfixUnit": "",
+        "visible": true,
+        "visible2": false,
+        "availableValues": [
+          {
+            "name": "1",
+            "value": "1"
+          },
+          {
+            "name": "800000",
+            "value": "800000"
+          }
+        ],
+        "enumGroup": "",
+        "name": "VT Numerator",
+        "dataType": "DoubleLongUnsigned",
+        "size": 4,
+        "readOnly": false,
+        "value": "1"
+      },
+      {
+        "id": 22,
+        "displayDataType": "NumericBox",
+        "min": "1",
+        "max": "400",
+        "prefixUnit": "",
+        "postfixUnit": "",
+        "visible": true,
+        "visible2": false,
+        "availableValues": [
+          {
+            "name": "1",
+            "value": "1"
+          },
+          {
+            "name": "400",
+            "value": "400"
+          }
+        ],
+        "enumGroup": "",
+        "name": "VT Denominator",
+        "dataType": "LongUnsigned",
+        "size": 4,
+        "readOnly": false,
+        "value": "1"
+      }
+    ],
+    "objectsRead": {
+      "size": 4,
+      "success": true,
+      "value": [
+        {
+          "value": "1",
+          "size": 1,
+          "success": true
+        },
+        {
+          "value": "1",
+          "size": 1,
+          "success": true
+        },
+        {
+          "value": "1",
+          "size": 1,
+          "success": true
+        },
+        {
+          "value": "1",
+          "size": 1,
+          "success": true
+        }
+      ]
+    }
+  }
+}

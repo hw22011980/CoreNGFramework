@@ -1,0 +1,28 @@
+export class ToolsData {
+    public plantNumber: string;
+    public fileName: string;
+    public isConnected: number;
+    public selectedFile: File;
+    public data: any;
+    constructor(plantNumber: string, fileName:string, isConnected: number, selectedFile: File, data:any = null) {
+      this.plantNumber = plantNumber;
+      this.fileName = fileName;
+      this.isConnected = isConnected;
+      this.selectedFile = selectedFile;
+      this.data = data;
+    }
+  
+}
+
+export class ExportPayload {
+  public plantNumber: string;
+  public fileName: string;
+  public isConnected: string;
+  public data: any;
+  constructor(plantNumber: string, fileName:string, isConnected:string,  data:any) {
+    this.plantNumber = plantNumber;
+    this.fileName = fileName;
+    this.isConnected = isConnected;
+    this.data = data;
+  }  
+}

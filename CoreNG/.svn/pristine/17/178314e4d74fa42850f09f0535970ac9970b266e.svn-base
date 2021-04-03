@@ -1,0 +1,23 @@
+import { Injectable } from '@angular/core';
+import { ActionResponse } from './shared/action-response.model';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class ActionResponseService {
+  actionResponse = new Map();
+  constructor() { }
+
+  get(actionResponseId: string) {
+    const actionResp = this.actionResponse.get(actionResponseId);
+    if (!actionResp) {
+      return undefined;
+    }
+
+    return actionResp.response;
+  }
+  put(actionResponseId: string, response: ActionResponse): void {
+    const entry = { actionResponseId, response };
+    this.actionResponse.set(actionResponseId, entry);
+  }
+}

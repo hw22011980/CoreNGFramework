@@ -1,0 +1,11 @@
+td {
+    cursor: pointer;
+}
+.btn 
+{
+  border-radius: 30px;
+}
+.badge 
+{
+    border-radius: 30px;
+}

@@ -1,0 +1,400 @@
+import { HttpParams } from '@angular/common/http';
+import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
+import { FormControl, FormGroup } from '@angular/forms';
+import { Router } from '@angular/router';
+import { ToastrService } from 'ngx-toastr';
+import { PagerService } from 'src/app/core/pager/pager.service';
+import { SearchField, SearchFields, SearchResult } from 'src/app/search/search.model';
+import { SpinnerService } from 'src/app/spinner/spinner.service';
+import { SiteService } from '../site.service';
+import { forkJoin, Subscription } from 'rxjs';
+import { ConfirmToastComponent } from 'src/app/core/custom-toast/confirm-toast/confirm-toast.component';
+import { Site, SiteMode, SiteRequest } from '../shared/site.model';
+import { Envelop, ICrossComponentMsg, EventMessage } from 'src/app/common/cross-component-msg';
+import { PublishDetailsService } from 'src/app/services/publish-details.service';
+import { SearchComponent } from 'src/app/search/search.component';
+
+@Component({
+  selector: 'app-site-list',
+  templateUrl: './site-list.component.html',
+  styleUrls: ['./site-list.component.css']
+})
+export class SiteListComponent implements OnInit, AfterViewInit, ICrossComponentMsg {
+
+  // Search fields
+  searchModel: SearchFields = {};
+  searchFields: SearchField[] = [];
+  searchField: SearchField = {};
+  searchValues: SearchResult[] = [];
+
+  // Site
+  sites: Site[];
+  clonedSites: Site[];
+  deletedSites: number[] = [];
+  updatedSites: Site[] = [];
+  pager: any = {};
+  pagedItems: Site[];
+  edit: boolean;
+
+  // Payload
+  site: SiteRequest;
+  sitelistForm: FormGroup;
+  envelop: Envelop;
+  xComponentSubscription: Subscription;
+  edited: boolean;
+  @ViewChild(SearchComponent)
+  searchComponent: SearchComponent;
+
+  constructor(public siteService: SiteService,
+    private pagerService: PagerService,
+    private toastrService: ToastrService,
+    private router: Router,
+    private emitDetails: PublishDetailsService,
+    public spinnerService: SpinnerService) {
+  }
+
+  onSubscribedData(data: any) {
+    throw new Error('Method not implemented.');
+  }
+
+  setEnvelop(data: any) {
+    this.envelop = new Envelop('HeaderComponent', 'SiteListComponent', 
+    'Send selected router path to HeaderComponent', data );
+  }
+
+  ngOnInit(): void {
+    this.createFormControl();
+    this.generateSearchComponent();
+    this.setEnvelop(null);
+    this.onGetSites();
+  }
+
+  ngAfterViewInit(): void {
+    this.setEnvelop(null);
+    this.onGetSites(true);
+  }
+
+  onSearch(search: SearchResult[] = null){
+    this.edit = false;
+    this.changeSiteStatus(false);
+    this.onGetSites(true, search);
+  }
+
+  onGetSites(refresh = false, search: SearchResult[] = null) {
+    this.pager = [];
+    this.sites = [];
+
+    let params = new HttpParams();
+
+    if (search !== null) {
+      this.searchValues = search;
+    }
+
+    // Begin assigning parameters
+    if (this.searchValues !== null) {
+      for (let i = 0; i < this.searchValues.length; i++) {
+        params = params.append(this.searchValues[i].Name, this.searchValues[i].Value);
+      }
+    }
+
+    this.siteService.getSites(refresh, params).then((sites) => {
+      this.sites = sites;
+      this.clonedSites = JSON.parse(JSON.stringify(sites));
+      this.setPage(1);
+    });
+  }
+
+  generateSearchComponent() {
+
+    // Search Values
+    this.searchField.Name = 'SiteName';
+    this.searchField.Description = 'Site Name';
+    this.searchField.FieldType = 'Search';
+    this.searchField.PlaceHolder = 'Search Site';
+    this.searchFields.push(this.searchField);
+
+    this.searchField = {};
+    this.searchField.Name = 'SiteID';
+    this.searchField.Description = 'Site ID';
+    this.searchField.FieldType = 'Search';
+    this.searchField.PlaceHolder = 'Search Site';
+    this.searchFields.push(this.searchField);
+    this.searchModel.SearchFields = this.searchFields;
+  }
+
+  createFormControl() {
+    this.sitelistForm = new FormGroup({
+      siteName: new FormControl("")
+    });
+  }
+
+  setPage(page: number, redirect = false) {
+
+    if (redirect && this.edit) {
+      if (this.pager.currentPage == page) return;
+      else {
+        //Check empty string validation
+        const emptySites = this.checkEmptySites();
+        if (emptySites.length > 0) {
+          let html = 'Site Names are empty at: <br>';
+          html += 'Site ID '
+          for (let i = 0; i < emptySites.length; i++) {
+            let emptySite = emptySites[i];
+            html += emptySite.siteID + ", ";
+          }
+          this.showErrorToastr(html, "You can't go to another page");
+          this.edit = true;
+          return;
+        }
+
+        // Merge Pagination data
+        if (this.updatedSites.length > 0)
+          this.updatedSites = this.updatedSites.concat(this.getUpdatedSites());
+        else
+          this.updatedSites = this.getUpdatedSites();
+      }
+    }
+
+    // get pager object from service
+    this.pager = this.pagerService.getPager(this.sites.length, page, 20);
+
+    // get current page of items
+    this.pagedItems = this.sites.slice(this.pager.startIndex, this.pager.endIndex + 1);
+  }
+
+  addNewSite() {
+    if (this.siteName.value === "" || this.siteName.value.trim() === "") {
+      this.showErrorToastr("Site Name is empty!", "Required Error");
+      return;
+    }
+
+    this.site = new SiteRequest();
+    this.site.mode = SiteMode.INSERT;
+    this.site.siteName = this.siteName.value;
+
+    this.siteService.createOrUpdateSite(this.site).subscribe((response) => {
+      this.clear();
+      this.onGetSites(true);
+      this.showCompleteToastr('Site successfully created.',
+        'Complete');
+    },
+      (error: any) => {
+        console.log(error);
+        this.showErrorToastr(error, 'Error');
+      },
+      () => {
+        console.log('finished...');
+      });
+  }
+
+  deleteSiteOnList(siteObj: Site) {
+    this.showConfirmToast("Are you sure you want to delete "+ siteObj.siteName +"?").onAction.subscribe(x =>{
+      if(x.title === "Yes"){
+        this.deleteSite(siteObj);
+        this.changeSiteStatus(true);
+      }
+    }); 
+  }
+
+  deleteSite(siteObj: Site) {
+    this.sites.forEach((item, index) => {
+      if (item.siteID == siteObj.siteID) {
+        this.sites.splice(index, 1);
+        this.deletedSites.push(item.siteID);
+      }
+    });
+    this.setPage(this.pager.currentPage);
+  }
+
+  onSiteChange(){
+    this.changeSiteStatus(true);
+  }
+
+  onEditSites() {
+    //Check empty string validation
+    const emptySites = this.checkEmptySites();
+    if (emptySites.length > 0) {
+      let html = 'Site Names are empty at: <br>';
+      html += 'Site ID '
+      for (let i = 0; i < emptySites.length; i++) {
+        let emptySite = emptySites[i];
+        html += emptySite.siteID + ", ";
+      }
+      this.showErrorToastr(html, "Error");
+      this.edit = true;
+      return;
+    }
+
+    const editedRequests = [];
+    // doing for both update and delete
+    if (this.deletedSites.length > 0) {
+      for (let i = 0; i < this.deletedSites.length; i++) {
+        let sitePayload = new SiteRequest();
+        sitePayload.mode = SiteMode.DELETE;
+        sitePayload.siteID = this.deletedSites[i];
+        editedRequests.push(this.siteService.createOrUpdateSite(sitePayload));
+      }
+    }
+
+    // Merge Pagination data
+    if (this.updatedSites.length > 0)
+      this.updatedSites = this.updatedSites.concat(this.getUpdatedSites());
+    else
+      this.updatedSites = this.getUpdatedSites();
+
+    // Add to requests
+    if (this.updatedSites.length > 0) {
+      for (let currentSite of this.updatedSites) {
+        let sitePayload = new SiteRequest();
+        sitePayload.mode = SiteMode.UPDATE;
+        sitePayload.siteID = currentSite.siteID;
+        sitePayload.siteName = currentSite.siteName;
+        editedRequests.push(this.siteService.createOrUpdateSite(sitePayload));
+      }
+    }
+
+    forkJoin(editedRequests).subscribe((results) => {
+      console.log(results);
+      this.deletedSites = [];
+      this.updatedSites = [];
+      this.onGetSites(true);
+      this.showMessage(results);
+    },
+      (error: any) => {
+        console.log(error);
+        this.showErrorToastr(error, 'Error');
+      },
+      () => {
+        this.changeSiteStatus(false);
+        if (editedRequests.length == 0) {
+          this.showWarningToastr("No changes found.", "Warning");
+        }
+      });
+  }
+
+  resetSites() {
+    // reset original datasets
+    // Deep copy from one list to another.
+    this.deletedSites = [];
+    this.updatedSites = [];
+    this.sites = JSON.parse(JSON.stringify(this.clonedSites));
+    this.changeSiteStatus(false);
+    this.setPage(this.pager.currentPage);
+  }
+
+  routeLink(siteObj: Site) {
+    if (!this.edit) {
+      this.router.navigate([`/sites/${siteObj.siteID}`]);
+    }
+  }
+
+  clear() {
+    this.sitelistForm.get('siteName').setValue("");
+    this.site = new SiteRequest();
+  }
+
+  checkEmptySites() {
+    let emptySites = [];
+    for (let i = 0; i < this.pagedItems.length; i++) {
+      let currentSite = this.pagedItems[i];
+      if (currentSite.siteName === "" || currentSite.siteName.trim() === "") {
+        emptySites.push(currentSite);
+      }
+    }
+    return emptySites;
+  }
+
+  getUpdatedSites() {
+    let tempSites: Site[] = [];
+    for (let i = 0; i < this.pagedItems.length; i++) {
+      let currentSite = this.pagedItems[i];
+      let originalSite = this.clonedSites.filter(site => site.siteID == currentSite.siteID)[0];
+      if (currentSite.siteName !== originalSite.siteName) {
+        if (this.updatedSites.length > 0) {
+          this.updatedSites = this.updatedSites.filter(site => site.siteID != currentSite.siteID);
+        }
+        tempSites.push(currentSite);
+      }
+    }
+    return tempSites;
+  }
+
+  showErrorToastr(message: string, title: string) {
+    this.toastrService.clear(); // clean up first before showing all another
+    this.toastrService.error(message, title, {
+      enableHtml: true,
+      easeTime: 300,
+      timeOut: 10000,
+      closeButton: true,
+      tapToDismiss: false,
+      positionClass: 'toast-bottom-left'
+    });
+  }
+
+  showCompleteToastr(message: string, title: string) {
+    this.toastrService.clear();
+    const html = message;
+    this.toastrService.success(html, title, {
+      enableHtml: true,
+      easeTime: 300,
+      timeOut: 10000,
+      closeButton: true,
+      tapToDismiss: false,
+      positionClass: 'toast-bottom-left'
+    });
+  }
+
+  showWarningToastr(message: string, title: string) {
+    this.toastrService.clear();
+    const html = message;
+    this.toastrService.warning(html, title, {
+      enableHtml: true,
+      easeTime: 300,
+      timeOut: 10000,
+      closeButton: true,
+      tapToDismiss: false,
+      positionClass: 'toast-bottom-left'
+    });
+  }
+
+  showMessage(results: any) {
+    let html = "<ol>";
+    let arr1 = [];
+    for (let result of results) {
+      arr1.push(result.success);
+      html += "<li>" + result.message + "</li>";
+    }
+    html += "</ol>";
+
+    let checkerSuccess = arr => arr.every(v => v === true);
+    let checkerFailed = arr => arr.every(v => v === false);
+
+    if (checkerSuccess(arr1)) {
+      this.showCompleteToastr(html, 'Editing Sites Completed');
+    } else if (checkerFailed(arr1)) {
+      this.showErrorToastr(html, 'Editing Sites Failed');
+    } else {
+      this.showWarningToastr(html, 'Editing Sites Completed with Errors');
+    }
+  }
+
+  showConfirmToast(message: string, title?: string) {
+    this.toastrService.clear();
+    const confirmToast = this.toastrService.show(message, title, {
+      toastComponent: ConfirmToastComponent,
+      closeButton: true,
+      disableTimeOut: true,
+      tapToDismiss: false,
+      positionClass: 'toast-center-center'
+    }, "toast-success");
+    return confirmToast;
+  }
+
+  private changeSiteStatus(status: boolean){
+    this.searchComponent.editedSite = status;
+    this.envelop.set(new EventMessage('editedSite', status));
+    this.emitDetails.messageEmitter.next(this.envelop);
+  }
+
+  get siteName() { return this.sitelistForm.get('siteName'); }
+}

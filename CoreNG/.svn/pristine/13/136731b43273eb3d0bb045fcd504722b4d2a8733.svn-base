@@ -1,0 +1,29 @@
+<div class="container-fluid">
+  <div class="d-flex flex-column mt-3">
+    <div *ngIf="connected"><button type="button" [disabled]="!disableClick"
+        class="btn btn-outline-light btn-block btn-sm" (click)="onToolsButtonClicked($event,1)">Read from Meter</button>
+      <hr />
+    </div>
+    <div *ngIf="connected"><button type="button" [disabled]="!disableClick"
+        class="btn btn-outline-light btn-block btn-sm" (click)="onToolsButtonClicked($event,2)">Write to Meter</button>
+      <hr />
+    </div>
+    <div *ngIf="connected"><button type="button" [disabled]="!disableClick"
+        class="btn btn-outline-light btn-block btn-sm" (click)="onToolsButtonClicked($event,3)">Compare</button>
+      <hr />
+    </div>
+    <div *ngIf="this.importToggle ; else appCustomImport">
+      <button type="button" [disabled]="!disableClick" class="btn btn-outline-light btn-block btn-sm"
+        (click)="onImportToggle()">Import</button>
+      <hr />
+    </div>
+    <ng-template #appCustomImport>
+      <app-custom-import (onhandleFileInput)="handleFileInput($event,4)" (onImport)="onImport($event)" (onClose)="onCustomImportClose()" ></app-custom-import>
+    </ng-template>
+    <div><button type="button" [disabled]="!disableClick" class="btn btn-outline-light btn-block btn-sm"
+        (click)="onToolsButtonClicked($event,5)">Export</button>
+      <hr />
+    </div>
+    <div>
+    </div>
+  </div>

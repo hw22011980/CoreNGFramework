@@ -1,0 +1,104 @@
+<nz-card>
+  <div class="row m-b-30">
+    <div class="col-lg-8">
+      <div class="d-md-flex">
+        <div class="m-b-10 m-r-20">
+          <nz-input-group [nzPrefix]="prefixTemplate">
+            <input
+              type="text"
+              nz-input
+              placeholder="Pencarian"
+              [(ngModel)]="searchInput"
+            />
+          </nz-input-group>
+          <ng-template #prefixTemplate>
+            <i nz-icon nzType="search" class="opacity-05"></i>
+          </ng-template>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-4 text-right">
+      <a nz-button nzType="primary" (click)="onAdd()">
+        <i nz-icon nzType="plus-circle" theme="outline"></i>
+        <span>Tambah Data</span>
+      </a>
+    </div>
+  </div>
+  <nz-table
+    #table
+    [nzData]="data | search: searchColumns:searchInput"
+    nzTableLayout="auto"
+  >
+    <thead>
+      <tr>
+        <th *ngFor="let column of orderColumn" [nzSortFn]="column.compare">
+          {{ column.title }}
+        </th>
+        <th *ngIf="!readOnly && data && data.length">Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let item of table.data; let i = index">
+        <ng-template #defaultTableDataTemplate>
+          <td *ngFor="let column of orderColumn">
+            <ng-container [ngSwitch]="column.type">
+              <ng-container *ngSwitchCase="'currency'">
+                {{ item[column.key] | currency: "IDR" }}
+              </ng-container>
+              <ng-container *ngSwitchDefault>
+                {{ item[column.key] }}
+              </ng-container>
+            </ng-container>
+          </td>
+        </ng-template>
+        <ng-container
+          *ngTemplateOutlet="
+            tableDataTemplate ? tableDataTemplate : defaultTableDataTemplate;
+            context: { $implicit: item }
+          "
+        ></ng-container>
+        <td *ngIf="!readOnly" class="action">
+          <div>
+            <a
+              class="text-gray font-size-18"
+              nz-dropdown
+              nzTooltipPlacement="bottomRight"
+              nzTrigger="click"
+              [nzDropdownMenu]="actionList"
+            >
+              <i nz-icon nzType="ellipsis" theme="outline"></i>
+            </a>
+            <nz-dropdown-menu #actionList="nzDropdownMenu">
+              <ul nz-menu nzSelectable>
+                <li nz-menu-item>
+                  <a (click)="onView(item)">
+                    <i nz-icon nzType="eye" theme="outline"></i>
+                    <span class="m-l-10">View</span>
+                  </a>
+                </li>
+                <li nz-menu-item>
+                  <a (click)="onEdit(item)">
+                    <i nz-icon nzType="edit" theme="outline"></i>
+                    <span class="m-l-10">Edit</span>
+                  </a>
+                </li>
+                <li nz-menu-divider></li>
+                <li nz-menu-item>
+                  <a
+                    nz-popconfirm
+                    nzPopconfirmTitle="Data akan dihapus. Apakah anda yakin?"
+                    (nzOnConfirm)="onDelete(item)"
+                    nzPopconfirmPlacement="topLeft"
+                  >
+                    <i nz-icon nzType="delete" theme="outline"></i>
+                    <span class="m-l-10">Delete</span>
+                  </a>
+                </li>
+              </ul>
+            </nz-dropdown-menu>
+          </div>
+        </td>
+      </tr>
+    </tbody>
+  </nz-table>
+</nz-card>

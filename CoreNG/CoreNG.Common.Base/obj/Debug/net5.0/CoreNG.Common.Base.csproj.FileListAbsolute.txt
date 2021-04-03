@@ -1,0 +1,11 @@
+D:\CoreNG\CoreNG\CoreNG.Common.Base\bin\Debug\net5.0\CoreNG.Common.Base.deps.json
+D:\CoreNG\CoreNG\CoreNG.Common.Base\bin\Debug\net5.0\CoreNG.Common.Base.dll
+D:\CoreNG\CoreNG\CoreNG.Common.Base\bin\Debug\net5.0\ref\CoreNG.Common.Base.dll
+D:\CoreNG\CoreNG\CoreNG.Common.Base\bin\Debug\net5.0\CoreNG.Common.Base.pdb
+D:\CoreNG\CoreNG\CoreNG.Common.Base\obj\Debug\net5.0\CoreNG.Common.Base.GeneratedMSBuildEditorConfig.editorconfig
+D:\CoreNG\CoreNG\CoreNG.Common.Base\obj\Debug\net5.0\CoreNG.Common.Base.AssemblyInfoInputs.cache
+D:\CoreNG\CoreNG\CoreNG.Common.Base\obj\Debug\net5.0\CoreNG.Common.Base.AssemblyInfo.cs
+D:\CoreNG\CoreNG\CoreNG.Common.Base\obj\Debug\net5.0\CoreNG.Common.Base.csproj.CoreCompileInputs.cache
+D:\CoreNG\CoreNG\CoreNG.Common.Base\obj\Debug\net5.0\CoreNG.Common.Base.dll
+D:\CoreNG\CoreNG\CoreNG.Common.Base\obj\Debug\net5.0\ref\CoreNG.Common.Base.dll
+D:\CoreNG\CoreNG\CoreNG.Common.Base\obj\Debug\net5.0\CoreNG.Common.Base.pdb

@@ -1,0 +1,42 @@
+import { RouterModule, Routes } from '@angular/router';
+import { NgModule } from '@angular/core';
+
+import {DevicesComponent} from './devices.component';
+import {DeviceInfoComponent} from './device-info/device-info.component';
+import {DeviceListComponent} from './device-list/device-list.component';
+import { DeviceSetupComponent } from './device-setup/device-setup.component';
+import { DeviceNavigationComponent } from './device-navigation/device-navigation.component';
+import { FormComponent } from '../stages/stage.base';
+import { StageViewCollection } from '../stages/stage.factories';
+import { CanDeactivateGuard } from '../core/can-deactivate/can-deactivate.guard';
+
+const devicesRoutes: Routes = [
+  { path: '', component: DevicesComponent, children: [
+      {path: '', component: DeviceListComponent},
+      {path: ':id', component: DeviceNavigationComponent, 
+        children: 
+        [
+         {path: '', component: DeviceInfoComponent},
+         {path: ':setup', component: DeviceSetupComponent, canDeactivate:[CanDeactivateGuard],
+          children:
+          [
+           {path: ':stage', component: FormComponent,
+              children:
+              [
+                {path: ':stage:name',component: StageViewCollection}
+              ]
+            }
+          ]
+         },
+        ]},
+      
+    ]
+  },
+];
+
+
+@NgModule({
+  imports: [RouterModule.forChild(devicesRoutes)],
+  exports: [RouterModule]
+})
+export class DevicesRoutingModule { }

@@ -1,0 +1,19 @@
+import { Component, OnInit } from '@angular/core';
+import {AuthService} from '../auth/auth.service';
+import {Router} from '@angular/router';
+import {KeysService} from './keys.service';
+
+@Component({
+  selector: 'app-keys',
+  templateUrl: './keys.component.html',
+  styleUrls: ['./keys.component.css']
+})
+export class KeysComponent implements OnInit {
+
+  constructor(private keysService: KeysService,
+              private authService: AuthService,
+              private router: Router) { }
+
+  ngOnInit() {
+  }
+}
