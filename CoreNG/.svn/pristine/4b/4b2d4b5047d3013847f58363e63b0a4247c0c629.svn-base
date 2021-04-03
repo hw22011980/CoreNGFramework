@@ -1,0 +1,23 @@
+import { Directive } from '@angular/core';
+import { Validator, ValidatorFn, AbstractControl, NG_VALIDATORS } from '@angular/forms';
+
+@Directive({
+    selector: '[appFileExtensionValidator]',
+    providers: [{
+        provide: NG_VALIDATORS,
+        useExisting: FileExtensionFirmwareValidator,
+        multi: true
+    }]
+})
+
+export class FileExtensionFirmwareValidator implements Validator {
+    validate(control: AbstractControl): { [key: string]: any } | null {
+        if (control.value === null || control.value === '') { return null; }
+        const ext = control.value.substring(control.value.lastIndexOf('.'));
+        if (ext.toLowerCase() === '.bin' && control.value !== '') {
+            return null;
+        } else {
+            return { 'invalidFile': true };
+        }
+    }
+}

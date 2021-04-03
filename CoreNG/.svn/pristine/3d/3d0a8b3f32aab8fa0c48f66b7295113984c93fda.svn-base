@@ -1,0 +1,392 @@
+import { Injectable } from '@angular/core';
+import { tap } from 'rxjs/operators';
+import { HttpClient, HttpErrorResponse, HttpHeaders, HttpRequest, HttpParams, HttpResponse } from '@angular/common/http';
+
+import { Devices } from './shared/devices.model';
+import { CoreService } from '../core/core.service';
+import { AuthService } from '../auth/auth.service';
+import { Observable } from 'rxjs';
+import { ActionResponse } from '../action-response/shared/action-response.model';
+import { Device } from './shared/device.model';
+import { StandardResponse } from '../standard-response/shared/standard-response.model';
+import { Console } from '@angular/core/src/console';
+import { DeviceRequestComms } from './shared/device-comms-request.model';
+import { DeviceRequest } from './shared/device-request.model';
+import { DeviceModel, DeviceSite } from './shared/device-type.model';
+import { NULL_EXPR } from '@angular/compiler/src/output/output_ast';
+import { ExportPayload, ToolsData } from './device-setup/tools/tools-type.model';
+import { ToolsComponent } from './device-setup/tools/tools.component';
+
+
+@Injectable({
+  providedIn: 'root'
+})
+export class DeviceService {
+  private formData: FormData;
+  public devices: Devices;
+  public actionResponse: ActionResponse;
+  meterTypeDictionary: any = {};
+  deviceSiteDictionary: any = {};
+  deviceTypeDictionary: any = {}; // readable dictionary values
+  deviceModelDictionary: Device[] = [];
+  deviceStatusDictionary: any = {};
+  statusDictionary: any = {}; // readable dictionary values
+  communicationProfileDictionary: any = {};
+  supportingLayerDictionary: any = {};
+  iecOpeningDictionary: any = {};
+  parityDictionary: any = {};
+  stopBits: any = {};
+  dataBits: any = {};
+  dlmsAddressSchemeDictionary: any = {};
+  applicationContextDictionary: any = {};
+  authenticationMethodDictionary: any = {};
+  baudRateDictionary: any = {};
+
+  constructor(private coreService: CoreService,
+    private authService: AuthService,
+    private httpClient: HttpClient) {
+    this.getSites().then(
+      sites => {
+        for (let i = 0; i < sites.length; i++) {
+          this.deviceSiteDictionary[sites[i].siteName] = sites[i].siteID;
+        }
+      }
+    );
+  }
+
+  public async GetDeviceById(deviceId) {
+    let params = new HttpParams();
+    params = params.append('deviceId', String(deviceId));
+    let device: any;
+
+    const response = await this.getDevices(true, params).then((devices) => {
+      device = devices.devices[0];
+      localStorage.setItem('device', JSON.stringify(device));
+      // already exist in 'device'
+      // localStorage.setItem('plantNumber', device.plantNumber);
+    },
+      (error: any) => {
+        console.log(error);
+      });
+    return device;
+  }
+  public getSelectedDevice(deviceId) {
+    const strdevice = localStorage.getItem('device');
+    let device = JSON.parse(strdevice);
+    if ((device == null) || (device.deviceType.deviceTypeId !== deviceId)) {
+      device = this.GetDeviceById(deviceId);
+      // redundant inside this.GetDeviceById(deviceId) in line 65
+      // localStorage.setItem('device', JSON.stringify(device));
+      // localStorage.setItem('plantNumber', device.plantNumber);
+    }
+    return device;
+  }
+
+  async getDevices(refresh = false, params = new HttpParams()) {
+    this.authService.checkToken();
+
+    let headers = new HttpHeaders();
+    if (refresh) {
+      headers = headers.append('Refresh', 'true');
+    }
+    const options = { params: params, headers: headers };
+
+    const response = await this.httpClient.get<Devices>(this.getDevicesRequestUrl(), options).toPromise();
+    return response;
+  }
+
+  setDevices(refresh = false, params = new HttpParams(), deviceAction = '') {
+    let headers = new HttpHeaders();
+    if (refresh) {
+      headers = headers.append('Refresh', 'true');
+    }
+    const options = { params: params, headers: headers };
+
+    return this.httpClient.post<StandardResponse>(this.getDevicesRequestUrl()
+      + '/' + deviceAction + '?' + params.toString(), null, options)
+      .pipe(
+        tap(data => {
+        })
+      );
+  }
+
+
+  public setImport(setupPayload: ToolsData, deviceID: number, ToolsCommand: string) {
+    const RequestUrl = `${this.coreService.getServerAddress()}setup/${deviceID}/${ToolsCommand}?doImport=true`;
+    this.formData = new FormData();
+    this.formData.append('plantNumber', setupPayload.plantNumber);
+    this.formData.append('fileName', setupPayload.selectedFile);
+    this.formData.append('isConnected', String(setupPayload.isConnected));
+    return this.httpClient.post<ActionResponse>(RequestUrl, this.formData,)
+      .pipe(
+        tap(data => {
+          //console.log(data);
+        })
+      );
+  }
+
+  public async setExportOrig(setupPayload: ToolsData, deviceID: number, ToolsCommand: string) {
+    const RequestUrl = `${this.coreService.getServerAddress()}setup/${deviceID}/${ToolsCommand}`;
+    const headers = { 'content-type': 'application/json' }
+
+    let body: any;
+
+    if (setupPayload.data.length > 0) {
+      body = {
+        plantNumber: setupPayload.plantNumber,
+        fileName: `${setupPayload.plantNumber}.xml`,
+        isConnected: String(setupPayload.isConnected),
+        data: setupPayload.data
+      }
+    }
+    else {
+      body = {
+        plantNumber: setupPayload.plantNumber,
+        fileName: `${setupPayload.plantNumber}.xml`,
+        isConnected: String(setupPayload.isConnected)
+      }
+
+    }
+    const response = await this.httpClient.post<StandardResponse>(RequestUrl, body, { 'headers': headers }).toPromise();
+    return response;
+  }
+
+
+  public setExport(setupPayload: ToolsData, deviceID: number, ToolsCommand: string) {
+    const RequestUrl = `${this.coreService.getServerAddress()}setup/${deviceID}/${ToolsCommand}?doExport=true`;
+    var response = null;
+    if (setupPayload.data.length > 0) {
+      const options = { responseType: 'blob' as 'json' }
+      const content = {
+        plantNumber: setupPayload.plantNumber,
+        fileName: `${setupPayload.plantNumber}.xml`,
+        isConnected: String(setupPayload.isConnected),
+        data: setupPayload.data
+      }
+      console.log(JSON.stringify(content));
+      response = this.httpClient.post<Blob>(RequestUrl, content, options)
+    }
+    return response;
+
+  }
+
+  public uploadTSV(fileToUpload: File, siteID: number = null) {
+
+    let uploadTSVRequestUrl = this.coreService.getServerAddress() + 'devices/import';
+    if (siteID)
+      uploadTSVRequestUrl += `/${siteID}`;
+
+    this.formData = new FormData();
+    this.formData.append('TSVFile', fileToUpload);
+    return this.httpClient.put<ActionResponse>(uploadTSVRequestUrl, this.formData)
+      .pipe(
+        tap(data => {
+          console.log(data);
+        })
+      );
+  }
+
+  public updateDeviceInformation(devicePayload: DeviceRequest) {
+    const updateDeviceURL = this.coreService.getServerAddress() + 'devices/' + devicePayload.DeviceId;
+    return this.httpClient.put<StandardResponse>(updateDeviceURL, devicePayload)
+      .pipe(
+        tap(data => {
+          // console.log(data);
+        })
+      );
+  }
+
+  public createDeviceInformation(devicePayload: DeviceRequest) {
+    const createDeviceURL = this.coreService.getServerAddress() + 'devices';
+    return this.httpClient.post<StandardResponse>(createDeviceURL, devicePayload)
+      .pipe(
+        tap(data => {
+        })
+      );
+  }
+
+  getMeterTypeDictionary() {
+    this.meterTypeDictionary['Mk10E'] = '11';
+    this.meterTypeDictionary['G6000'] = '21';
+    this.meterTypeDictionary['Mk10M'] = '24';
+    this.meterTypeDictionary['Mk7B'] = '81';
+    this.meterTypeDictionary['Mk10D'] = '89';
+    this.meterTypeDictionary['Itron'] = '149';
+    this.meterTypeDictionary['DLMS'] = '162';
+    this.meterTypeDictionary['LANDIS_GYR_ZMD'] = '164';
+    this.meterTypeDictionary['LANDIS_GYR_ZMG'] = '165';
+    this.meterTypeDictionary['LANDIS_GYR_ZMQ'] = '166';
+    this.meterTypeDictionary['PRECISE'] = '167';
+    this.meterTypeDictionary['KAIFA'] = '168';
+    this.meterTypeDictionary['Mk10MDC'] = '170';
+    this.meterTypeDictionary['Inhemeter_i310'] = '171';
+    return this.meterTypeDictionary;
+  }
+
+  getDeviceTypeDictionary() {
+    this.deviceTypeDictionary['Mk10E'] = 'Mk11';
+    this.deviceTypeDictionary['G6000'] = 'G6000';
+    this.deviceTypeDictionary['Mk10M'] = 'Mk10M';
+    this.deviceTypeDictionary['Mk7B'] = 'Mk7B';
+    this.deviceTypeDictionary['Mk10D'] = 'Mk10D';
+    this.deviceTypeDictionary['Itron'] = 'Itron';
+    this.deviceTypeDictionary['DLMS'] = 'DLMS';
+    this.deviceTypeDictionary['LANDIS_GYR_ZMD'] = 'LANDIS_GYR_ZMD';
+    this.deviceTypeDictionary['LANDIS_GYR_ZMG'] = 'LANDIS_GYR_ZMG';
+    this.deviceTypeDictionary['LANDIS_GYR_ZMQ'] = 'LANDIS_GYR_ZMQ';
+    this.deviceTypeDictionary['PRECISE'] = 'PRECISE';
+    this.deviceTypeDictionary['KAIFA'] = 'KAIFA';
+    this.deviceTypeDictionary['Mk10MDC'] = 'Mk10MDC';
+    this.deviceTypeDictionary['Inhemeter_i310'] = 'Inhemeter_i310';
+    return this.deviceTypeDictionary;
+  }
+
+  async getSites(): Promise<DeviceSite[]> {
+    // this.authService.checkToken();
+    const params = new HttpParams();
+    let headers = new HttpHeaders();
+    headers = headers.append('Refresh', 'true');
+    const options = { params: params, headers: headers };
+
+    const url = this.coreService.getServerAddress() + 'sites';
+    const response = await this.httpClient.get<DeviceSite[]>(url, options).toPromise();
+    return response;
+  }
+  getSiteDictionary() {
+    return this.deviceSiteDictionary;
+  }
+  async getDeviceModels(meterType): Promise<DeviceModel[]> {
+    // this.authService.checkToken();
+    const params = new HttpParams();
+    let headers = new HttpHeaders();
+    headers = headers.append('Refresh', 'true');
+    const options = { params: params, headers: headers };
+
+    const url = this.getDevicesRequestUrl() + '/models?deviceTypeValue=' + meterType;
+    const response = await this.httpClient.get<DeviceModel[]>(url, options).toPromise();
+    return response;
+  }
+
+  getDeviceModelDictionary(meterType) {
+    this.getDeviceModels(meterType).then(
+      dm => {
+        const deviceModelDictionary: any = {};
+        for (let i = 0; i < dm.length; i++) {
+          deviceModelDictionary[dm[i].deviceModelName] = dm[i].deviceModelID.toString();
+        }
+        console.log(deviceModelDictionary);
+        return deviceModelDictionary;
+      }
+    );
+    return this.deviceModelDictionary;
+  }
+  findValue(dictionary, value) {
+    for (const i in dictionary) {
+      if (dictionary[i] === value) {
+        // Add an element to the dictionary
+        return i; // If you want to break out of the loop once you've found a match
+      }
+    }
+  }
+  getDeviceStatusDictionary() {
+    this.deviceStatusDictionary['Awaiting Installation'] = '1';
+    this.deviceStatusDictionary['Installed'] = '2';
+    this.deviceStatusDictionary['Commissioned'] = '3';
+    return this.deviceStatusDictionary;
+  }
+
+  getStatusDictionary() {
+    this.statusDictionary['Awaiting Installation'] = 'AwaitingInstallation';
+    this.statusDictionary['Installed'] = 'Installed';
+    this.statusDictionary['Commissioned'] = 'Commissioned';
+    return this.statusDictionary;
+  }
+
+  getDeviceCommunicationProfileDictionary() {
+    this.communicationProfileDictionary['TCP'] = 'TCP';
+    this.communicationProfileDictionary['HDLC'] = 'HDLC';
+    return this.communicationProfileDictionary;
+  }
+
+  getDeviceSupportingLayerDictionary() {
+    this.supportingLayerDictionary['Serial'] = 'Serial';
+    this.supportingLayerDictionary['TCP'] = 'TCP';
+    return this.supportingLayerDictionary;
+  }
+
+  getIECOpeningDictionary() {
+    this.iecOpeningDictionary['True'] = 'true';
+    this.iecOpeningDictionary['False'] = 'false';
+    return this.iecOpeningDictionary;
+  }
+
+  getParityDictionary() {
+    this.parityDictionary['None'] = 'None';
+    this.parityDictionary['Odd'] = 'Odd';
+    this.parityDictionary['Even'] = 'Even';
+    this.parityDictionary['Mark'] = 'Mark';
+    this.parityDictionary['Space'] = 'Space';
+    return this.parityDictionary;
+  }
+
+  getStopBitsDictionary() {
+    this.stopBits['None'] = 'None';
+    this.stopBits['One'] = 'One';
+    this.stopBits['Two'] = 'Two';
+    this.stopBits['OnePointFive'] = 'OnePointFive';
+    return this.stopBits;
+  }
+
+  getDataBitsDictionary() {
+    this.dataBits['5'] = '5';
+    this.dataBits['6'] = '6';
+    this.dataBits['7'] = '7';
+    this.dataBits['8'] = '8';
+    return this.dataBits;
+  }
+
+  getDLMSAddressSchemeDictionary() {
+    this.dlmsAddressSchemeDictionary['1'] = '1';
+    this.dlmsAddressSchemeDictionary['2'] = '2';
+    this.dlmsAddressSchemeDictionary['4'] = '4';
+    return this.dlmsAddressSchemeDictionary;
+  }
+
+  getApplicationContextDictionary() {
+    this.applicationContextDictionary['LN'] = 'LN';
+    this.applicationContextDictionary['SN'] = 'SN';
+    this.applicationContextDictionary['LN_WITH_CIPHERING'] = 'LN_WITH_CIPHERING';
+    this.applicationContextDictionary['SN_WITH_CIPHERING'] = 'SN_WITH_CIPHERING';
+    return this.applicationContextDictionary;
+  }
+
+  getAuthenticationMethodDictionary() {
+    this.authenticationMethodDictionary['NO_SECURITY'] = 'NO_SECURITY';
+    this.authenticationMethodDictionary['LOW_SECURITY'] = 'LOW_SECURITY';
+    this.authenticationMethodDictionary['HLS'] = 'HLS';
+    this.authenticationMethodDictionary['HIGH_SECURITY_SHA1'] = 'HIGH_SECURITY_SHA1';
+    this.authenticationMethodDictionary['HIGH_SECURITY_GMAC'] = 'HIGH_SECURITY_GMAC';
+    return this.authenticationMethodDictionary;
+  }
+
+  getBaudRateDictionary() {
+    this.baudRateDictionary['300'] = '300';
+    this.baudRateDictionary['1200'] = '1200';
+    this.baudRateDictionary['2400'] = '2400';
+    this.baudRateDictionary['4800'] = '4800';
+    this.baudRateDictionary['9600'] = '9600';
+    this.baudRateDictionary['19200'] = '19200';
+    this.baudRateDictionary['38400'] = '38400';
+    this.baudRateDictionary['57600'] = '57600';
+    this.baudRateDictionary['115200'] = '115200';
+    this.baudRateDictionary['230400'] = '230400';
+    this.baudRateDictionary['460800'] = '460800';
+    this.baudRateDictionary['921600'] = '921600';
+    return this.baudRateDictionary;
+  }
+
+  getDevicesRequestUrl() {
+    return this.coreService.getServerAddress() + 'devices';
+  }
+}
+

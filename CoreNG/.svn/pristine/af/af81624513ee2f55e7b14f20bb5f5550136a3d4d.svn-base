@@ -1,0 +1,27 @@
+import { NgModule } from '@angular/core';
+
+import { KeysListComponent } from './keys-list/keys-list.component';
+import { KeysRoutingModule } from './keys-routing.module';
+import { CommonModule } from '@angular/common';
+import { KeysComponent } from './keys.component';
+import { KeysDlmsAssociationListComponent } from './keys-dlms-association-list/keys-dlms-association-list.component';
+import { SearchModule } from '../search/search.module';
+import { SpinnerModule } from '../spinner/spinner.module';
+import { FormsModule } from '@angular/forms';
+
+@NgModule({
+  declarations: [
+    KeysComponent,
+    KeysListComponent,
+    KeysDlmsAssociationListComponent
+
+  ],
+  imports: [
+    CommonModule,
+    KeysRoutingModule,
+    SearchModule,
+    SpinnerModule,
+    FormsModule
+  ]
+})
+export class KeysModule { }

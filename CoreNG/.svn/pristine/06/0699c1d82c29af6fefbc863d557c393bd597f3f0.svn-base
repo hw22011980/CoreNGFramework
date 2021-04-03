@@ -1,0 +1,8 @@
+import {JobActionParamsData} from './job-actions-params-data.model';
+
+export class JobActions {
+  jobActionId: number;
+  actionType: string;
+  actionOrder: number;
+  jobActionParamsDataList: JobActionParamsData[];
+}

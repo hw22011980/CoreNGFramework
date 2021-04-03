@@ -1,0 +1,17 @@
+import { NgModule } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { LoginComponent } from './login/login.component';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { SpinnerModule } from '../spinner/spinner.module';
+import { LicenseComponent } from './license/license.component';
+
+@NgModule({
+  declarations: [LoginComponent, LicenseComponent],
+  imports: [
+    CommonModule,
+    FormsModule,
+    ReactiveFormsModule,
+    SpinnerModule
+  ]
+})
+export class AuthModule { }

@@ -1,0 +1,49 @@
+::ng-deep .md-class .modal-dialog { 
+    max-width: 40% !important;
+    width: 40%;
+}
+
+.inputError{    
+    font-size: small;
+    color: red;
+    vertical-align:middle;
+    line-height: 37px;
+}
+
+.form-time {
+    width: 20% !important;
+    margin: 0px 0px 5px 5px;
+}
+
+.custom {
+    width: 90px !important;
+}
+
+.custom_list{
+    width: 90px !important;
+    height: 30px !important;
+}
+.btn 
+{
+  border-radius: 30px;
+  font-size: small;
+  margin: 2;
+  padding-left: 1;
+  padding-right: 1;
+}
+
+.add_item_message {
+    color: red;
+    font-style: italic;
+    font-size: small;
+}
+
+table {
+    font-size: 1.1em;
+}
+
+.no-row {
+    text-align: center;
+    font-size: .875rem;
+}
+

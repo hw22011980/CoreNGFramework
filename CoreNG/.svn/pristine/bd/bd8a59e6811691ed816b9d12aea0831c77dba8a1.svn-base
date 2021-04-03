@@ -1,0 +1,10 @@
+<table class="table table-striped table-hover shadow p-3 mb-5 bg-white rounded">
+  <thead>
+    <tr>
+      <th *ngFor="let header of tableInformation.Header">{{header}}</th>
+    </tr>
+  </thead>
+  <tr *ngFor="let row of tableInformation.Rows" routerLink="{{tableInformation.Router}}/{{row.Column[0]}}">
+    <td *ngFor="let columns of row.Column">{{columns}}</td>
+  </tr>
+</table>

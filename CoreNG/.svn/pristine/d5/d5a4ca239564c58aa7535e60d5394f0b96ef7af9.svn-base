@@ -1,0 +1,89 @@
+import { NgModule } from '@angular/core';
+import { CommonModule } from '@angular/common';
+
+import { DeviceListComponent } from './device-list/device-list.component';
+import { DeviceInfoComponent } from './device-info/device-info.component';
+import { DevicesComponent } from './devices.component';
+import { DevicesRoutingModule } from './devices-routing.module';
+import { SearchModule } from '../search/search.module';
+import { SpinnerModule } from '../spinner/spinner.module';
+import { InfoDisplayModule } from '../info-display/info-display.module';
+import { DeviceNavigationComponent } from './device-navigation/device-navigation.component';
+import { DeviceSetupComponent } from './device-setup/device-setup.component';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+
+import { FormComponent }    from '../stages/stage.base';
+import { FormDirective }          from '../stages/stage.directive';
+import { StageViewCollection }            from '../stages/stage.factories';
+import { DynamicInputsComponent } from '../stages/templates/stage-common/dynamic-inputs/dynamic-inputs.component';
+import { AddItemListComponent } from '../stages/templates/stage-common/addItem-List/addItem-List.component';
+import { DisplayProfileComponent } from '../stages/templates/stage-common/table-List/table-List.component';
+import { StageBasicComponent } from '../stages/templates/stage-basic/stage-basic.component';
+import { StageTableComponent } from '../stages/templates/stage-table/stage-table.component';
+import { CoreModule } from '../core/core.module';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { library as fontLibrary } from '@fortawesome/fontawesome-svg-core';
+import { faCalendar,  faClock, faComment, faListAlt, faCaretSquareDown, faEdit} from '@fortawesome/free-regular-svg-icons';
+import { DeviceCreateComponent } from './device-create/device-create.component';
+import { ToolsComponent } from './device-setup/tools/tools.component';
+import { DevicesPerSiteComponent } from './devices-per-site/devices-per-site.component';
+import { DeviceLinkComponent } from './device-link/device-link.component';
+import { CompareSetupComponent } from '../stages/compare-setup/compare-setup.component';
+import { MultipleSetupComponent } from '../stages/multiple-setup/multiple-setup.component';
+import { CustomImportComponent } from './device-setup/tools/custom-import/custom-import.component';
+
+
+fontLibrary.add(
+  faCalendar,
+  faClock,
+  faListAlt,
+  faCaretSquareDown,
+  faEdit, faComment
+);
+
+@NgModule({
+  declarations: [
+    DeviceListComponent,
+    DeviceInfoComponent,
+    DevicesComponent,
+    DeviceNavigationComponent,
+    DeviceSetupComponent,
+    FormComponent,
+    FormDirective,
+    DynamicInputsComponent,
+    AddItemListComponent,
+    DisplayProfileComponent,
+    StageBasicComponent,
+    StageTableComponent,
+    DeviceCreateComponent,
+    ToolsComponent,
+    DevicesPerSiteComponent,
+    DeviceLinkComponent,
+    CompareSetupComponent,
+    MultipleSetupComponent,
+    CustomImportComponent
+  ],
+  imports: [
+    CommonModule,
+    DevicesRoutingModule,
+    SearchModule,
+    SpinnerModule,
+    InfoDisplayModule,
+    CommonModule,
+    FormsModule,
+    ReactiveFormsModule,
+    NgbModule,
+    CoreModule,
+    FontAwesomeModule
+  ],
+  exports: [
+    DevicesPerSiteComponent
+  ],
+  providers: [StageViewCollection],
+  entryComponents: [ 
+    StageBasicComponent,
+    StageTableComponent
+  ]
+})
+export class DevicesModule { }

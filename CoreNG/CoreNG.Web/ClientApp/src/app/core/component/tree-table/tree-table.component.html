@@ -1,0 +1,33 @@
+<table [attr.class]="'table table-tree-view table-striped table-hover shadow p-3 mb-5 bg-white rounded ' + configs.css.table_class" >
+  <thead 
+      app-tree-head
+      [store]="store"
+      [expand_tracker]="expand_tracker"
+      [internal_configs]="internal_configs"
+      [rowselectall]="rowselectall"
+      [rowdeselectall]="rowdeselectall"
+      [rdo1selectall]="rdo1selectall"
+      [rdo2selectall]="rdo2selectall"
+      [selectedValues]="selectedValues"
+      [columns]="columns"
+      [configs]="configs">
+  </thead>
+
+  <tbody 
+      app-tree-body
+      [store]="store"
+      [expand_tracker]="expand_tracker"
+      [internal_configs]="internal_configs"
+      [columns]="columns"
+      [configs]="configs"
+      [cellclick]="cellclick"
+      [expand]="expand"
+      [collapse]="collapse"
+      [rowselect]="rowselect"
+      [rowdeselect]="rowdeselect"
+      [rdo1select]="rdo1select"
+      [rdo2select]="rdo2select"
+      [selectedValues]="selectedValues"
+  >        
+  </tbody>
+</table>

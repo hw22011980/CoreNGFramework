@@ -1,0 +1,16 @@
+import {JobActions} from './job-actions.model';
+
+export class Schedule {
+  jobId: number;
+  scheduleExecutionId: number;
+  plantNumber: string;
+  scheduleExecutionJobId: number;
+  activationDate: object;
+  expiryDate: object;
+  timeToLive: number;
+  jobStatus: string;
+  retryRemaining: number;
+  jobType: string;
+  commitmentTime: object;
+  jobActions: JobActions[];
+}

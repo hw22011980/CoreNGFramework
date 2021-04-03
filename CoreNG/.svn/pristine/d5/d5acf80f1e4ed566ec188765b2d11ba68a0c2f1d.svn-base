@@ -1,0 +1,7 @@
+export const environment = {
+  production: true,
+  mddcsRestServiceAddress: 'localhost',
+  mddcsRestServicePort: '8182',
+  version: '{AURORA_VERSION}',
+  mddcsVersion: '{MDDCS_VERSION}'
+};

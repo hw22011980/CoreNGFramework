@@ -1,0 +1,106 @@
+<div class="card mb-5 rounded w-100" *ngIf="device!=null">
+  <div class="card-header container-fluid">
+    <div class="d-flex flex-sm-row justify-content-between mb-1">
+      <div class="d-flex flex-sm-row" id="devStages" [class.disabled]="!disableClick">
+        <div *ngIf="(enableCheckBox || toolsSlideInOffline)">
+          <input type="checkbox" [indeterminate]="milestone?.status === 'crossed'"
+            [ngModel]="milestone?.status === 'checked'" (ngModelChange)="checkMilestone(milestone)"
+            [class.disabled]="!disableClick">
+        </div>
+        DEVICE STAGES
+        <div class="ml-2" *ngIf="(enableCheckBox || toolsSlideInOffline)" [class.disabled]="!disableClick">         
+          <span class="icon" id="icon-folder" (click)="OnClickFolderIcon()" *ngIf="isCollapse">
+            <fa-icon [fixedWidth]="true" [icon]="openedFolderIcon"></fa-icon>
+          </span>
+          <span class="icon" id="icon-folder" (click)="OnClickFolderIcon()" *ngIf="!isCollapse">
+            <fa-icon [fixedWidth]="true" [icon]="closedFolderIcon"></fa-icon>
+          </span>
+          <span class="checkmark"></span>
+        </div>
+      </div>
+      <div class="d-flex flex-column">
+        <button (click)="toggleTools()" type="button" class="btn btn-link" [disabled]="!disableClick">
+          <fa-icon [fixedWidth]="true" [icon]="toolsCog"></fa-icon>Tools
+        </button>
+        <!-- toolsIcon toolsWrench toolsCog-->
+      </div>
+    </div>
+  </div>
+  <div id="setup-content" class="container-fluid">
+    <div class="row">
+      <div class="col-3 overflow-auto" id="column-pills-tab">
+        <app-nav-tree #navtree *ngIf="menus" [data]="menus" [disableClick]="!disableClick" (onClick)="clickMenu($event)"
+          (onDataOut)="onNavTreeData($event)" (onParentNodeCheck)="onParenNodesCheck($event)"> </app-nav-tree>
+      </div>
+      <div class="col-9">
+        <div>
+          <app-tools [@slideInOut]="toolState" (toolClicked)="onToolClicked($event)"></app-tools>
+        </div>
+          <div class="mt-5" >
+            <app-form-entry [frmConfig]="frmConfig"></app-form-entry>
+          </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<ng-container *ngIf="isProgressbarModalOpen">
+  <!-- To gray out browser background when modal show. -->
+  <div [ngClass]="{'modal-backdrop': isProgressbarModalOpen, 'show': isProgressbarModalOpen}"></div>
+
+  <!-- Modal ProgressBar -->
+  <div class="modal fade" id="progressBarModal" tabindex="-1" aria-labelledby="progressBarModalLabel" aria-hidden="true"
+    [ngStyle]="{'display': isProgressbarModalOpen ? 'block' : 'none'}" [ngClass]="{'show': isProgressbarModalOpen}"
+    data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog">
+      <div class="modal-content" [ngStyle]="{'opacity': isProgressbarModalOpen ? 1 : 0}">
+        <div class="modal-header">
+          <h5 class="modal-title" id="progressBarModalLabel">Testing</h5>
+        </div>
+        <div class="modal-body">
+          <app-multiple-setup [ids]="selectedMenuIds"></app-multiple-setup>
+        </div>
+        <div class="modal-footer">
+          <button type="button" id="btnClose" class="btn btn-delete" [disabled]="false"
+            (click)="isProgressbarModalOpen=false;">OK</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</ng-container>
+
+<ng-container *ngIf="isCompareModalOpen">
+  <!-- To gray out browser background when modal show. -->
+  <div [ngClass]="{'modal-backdrop': isCompareModalOpen, 'show': isCompareModalOpen}"></div>
+
+  <!-- Modal Compare Setup -->
+  <div class="modal fade" id="compareSetupModal" tabindex="-1" aria-labelledby="compareSetupModalLabel"
+    aria-hidden="true" [ngStyle]="{'display': isCompareModalOpen ? 'block' : 'none'}"
+    [ngClass]="{'show': isCompareModalOpen}" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog full_modal-dialog">
+      <div class="modal-content full_modal-content" [ngStyle]="{'opacity': isCompareModalOpen ? 1 : 0}">
+        <div class="modal-header">
+          <h5 class="modal-title" id="compareSetupModalLabel">Compare Setup</h5>
+        </div>
+        <div class="modal-body">
+          <app-compare-setup #compareSetup [ids]="selectedMenuIds"></app-compare-setup>
+        </div>
+        <div class="modal-footer justify-content-between">
+          <div class="float-left">
+            <button type="button" *ngIf="compareSetup.existDifferences" class="btn btn-success mr-1" [disabled]="compareSetup.disabledBtn" aria-label="Left Align" (click)="collapseAllTreeTable()">
+              <i class="fa fa-compress"></i> Collapse All
+            </button>
+            <button type="button" *ngIf="compareSetup.existDifferences" class="btn btn-success" [disabled]="compareSetup.disabledBtn" aria-label="Left Align" (click)="expandAllTreeTable()">
+              <i class="fa fa-expand"></i> Expand All
+            </button>
+          </div>
+          <div class="float-right">
+            <button type="button" *ngIf="compareSetup.existDifferences" [disabled]="compareSetup.disabledBtn" id="btnSave" class="btn btn-success mr-1" (click)="onSaveCompareSetup()">Save</button>
+            <button type="button" id="btnClose" class="btn btn-delete" [disabled]="compareSetup.disabledBtn"
+              (click)="isCompareModalOpen=false; onCancelCompareSetup()">Cancel</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</ng-container>

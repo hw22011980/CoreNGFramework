@@ -1,0 +1,20 @@
+import { NgModule } from '@angular/core';
+import {RouterModule, Routes} from '@angular/router';
+
+import {SchedulesComponent} from './schedules.component';
+import {SchedulesListComponent} from './schedules-list/schedules-list.component';
+import {SchedulesInfoComponent} from './schedules-info/schedules-info.component';
+
+const schedulesRoutes: Routes = [
+  { path: '', component: SchedulesComponent, children: [
+      {path: '', component: SchedulesListComponent},
+      {path: ':id', component: SchedulesInfoComponent}
+    ]
+  },
+];
+
+@NgModule({
+  imports: [RouterModule.forChild(schedulesRoutes)],
+  exports: [RouterModule]
+})
+export class SchedulesRoutingModule { }

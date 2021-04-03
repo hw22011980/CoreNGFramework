@@ -1,0 +1,90 @@
+import { Component, OnInit } from '@angular/core';
+import { SchedulesService } from '../schedules.service';
+import { Schedule } from '../shared/schedule.model';
+import { PagerService } from 'src/app/core/pager/pager.service';
+import { SearchFields, SearchField, SearchResult } from 'src/app/search/search.model';
+import { HttpParams } from '@angular/common/http';
+
+@Component({
+  selector: 'app-schedules-list',
+  templateUrl: './schedules-list.component.html',
+  styleUrls: ['./schedules-list.component.css']
+})
+export class SchedulesListComponent implements OnInit {
+  schedules: Schedule[];
+  pager: any = {};
+  pagedItems: Schedule[];
+  searchModel: SearchFields = {};
+  searchFields: SearchField[] = [];
+  searchField: SearchField = {};
+
+  constructor(private schedulesService: SchedulesService, private pagerService: PagerService) { }
+
+  ngOnInit() {
+    this.onGetSchedules();
+    this.generateSearchComponent();
+  }
+
+  onGetSchedules(refresh = false, search: SearchResult[] = null) {
+    let params = new HttpParams();
+
+    // Begin assigning parameters
+    if (search !== null) {
+      for (let i = 0; i < search.length; i++) {
+        params = params.append(search[i].Name, search[i].Value);
+      }
+    }
+
+    this.schedulesService.getSchedulesService(refresh, params).subscribe((schedules) => {
+      this.schedules = schedules.schedules;
+      this.setPage(1);
+    },
+      (err) => { this.pager = []; this.schedules = []; console.log(err); });
+  }
+
+  setPage(page: number) {
+    // get pager object from service
+    this.pager = this.pagerService.getPager(this.schedules.length, page);
+
+    // get current page of items
+    this.pagedItems = this.schedules.slice(this.pager.startIndex, this.pager.endIndex + 1);
+  }
+
+  generateSearchComponent() {
+    // Note: When creating this object, be mindful of the order you're creating it with.
+    // KeyValue pipe returns key-value pair in alphabetical order for strings, ascending for numbers
+
+    // Search Values
+    this.searchField.Name = 'ScheduleExecutionId';
+    this.searchField.Description = 'Schedule Execution Id';
+    this.searchField.FieldType = 'Search';
+    this.searchField.PlaceHolder = 'Search Schedules';
+    this.searchFields.push(this.searchField);
+
+    this.searchField = {};
+    this.searchField.Name = 'ScheduleExecutionJobId';
+    this.searchField.Description = 'Schedule Execution Job Id';
+    this.searchField.FieldType = 'Search';
+    this.searchField.PlaceHolder = 'Search Schedules';
+    this.searchFields.push(this.searchField);
+
+    this.searchField = {};
+    this.searchField.Name = 'PlantNumber';
+    this.searchField.Description = 'Plant Number';
+    this.searchField.FieldType = 'Search';
+    this.searchField.PlaceHolder = 'Search Schedules';
+    this.searchFields.push(this.searchField);
+
+    // Filters
+    this.searchField = {};
+    this.searchField.Name = 'JobStatus';
+    this.searchField.Description = 'Job Status';
+    this.searchField.FieldType = 'Filter';
+    this.searchField.PlaceHolder = 'All Job Status';
+    this.searchField.OptionValues = this.schedulesService.getJobStatus();
+    this.searchFields.push(this.searchField);
+
+    this.searchModel.SearchFields = this.searchFields;
+  }
+
+}

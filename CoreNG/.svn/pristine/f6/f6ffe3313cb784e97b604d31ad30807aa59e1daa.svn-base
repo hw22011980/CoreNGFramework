@@ -1,0 +1,99 @@
+<!-- <div class="container margin-left-info pt-5"> -->
+  <!-- <nav aria-label="breadcrumb">
+    <ol class="breadcrumb w-75">
+      <li class="breadcrumb-item"><a class="header" [routerLink]="['/devices']">DEVICES</a></li>
+      <li *ngIf='device!=null' class="breadcrumb-item active" aria-current="page">{{device.deviceId}}</li>
+    </ol>
+  </nav> -->
+  <div class="card mb-5 bg-white rounded w-100" *ngIf='device!=null'>
+    <app-info-display (myEvent)="onUpdateInformation($event)" [informationFields]="infoModel"></app-info-display>
+  </div>
+  <form [formGroup]="updateCommsFormGroup">
+    <div class="card mb-5 rounded w-100" *ngIf="device!=null">
+      <div class="card-header">
+        <div class="row">
+          <div class="col-9">{{this.infoCommModel.Header}}</div>
+          <div class="col-3">
+            <div class="row">
+              <div class="col-7">
+                <button *ngIf="edit" type="button" type="submit" class="btn btn-success btn-sm ml-5" id="apply"
+                  [disabled]="updateCommsFormGroup.invalid || updateCommsFormGroup.pristine" (click) = "edit=false; onUpdateMeterCommInformation()">Apply</button>
+              </div>
+              <div class="col-5">
+                <button *ngIf="edit" type="button" class="btn btn-danger btn-sm" data-toggle="tooltip"(click)= "edit=false; resetInformationDisplay();">Cancel</button>
+                <button *ngIf="!edit" type="button" class="btn btn-light btn-sm" data-toggle="tooltip" (click)="edit=true; enableEditableElements();">Edit ...
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="card-body">
+          <div *ngIf='infoCommFields != null'>
+            <div formArrayName="deviceComms">
+              <div *ngFor="let deviceComms of infoCommFields | keyvalue : KeepOrder; let i = index">
+                <div class="mb-3"
+                  *ngIf="deviceComms.value.FieldType==='Text' || deviceComms.value.FieldType==='Number'">
+                  <div class="input-group input-group-sm">
+                    <div class="input-group-prepend">
+                      <span class="input-group-text justify-content-end"
+                        id="inputGroup-sizing-sm">{{deviceComms.value.Description}}</span>
+                    </div>
+                    <input type="{{deviceComms.value.FieldType}}" [formControlName]="i" class="form-control"
+                      value="{{deviceComms.value.Value}}"
+                      min={{deviceComms.value.MinLength}}
+                      max={{deviceComms.value.MaxLength}}
+                      maxlength="{{deviceComms.value.MaxLength}}"
+                      (keypress)="disable_invalid_characters($event, deviceComms.value.FieldType)">
+                  </div>
+                  <div class="input-group input-group-sm"
+                    *ngIf="updateCommsFormGroup.controls['deviceComms'].controls[i].invalid">
+                    <div class="input-group-prepend"></div>
+                    <small class="small-error">{{getErrorMessage(updateCommsFormGroup.controls['deviceComms'].controls[i].value,infoCommFields, i)}}</small>
+                  </div>
+                </div>
+                <div class="mb-3" *ngIf="deviceComms.value.FieldType==='IPAddress'">
+                  <div class="input-group input-group-sm">
+                    <div class="input-group-prepend">
+                      <span class="input-group-text justify-content-end"
+                        id="inputGroup-sizing-sm">{{deviceComms.value.Description}}</span>
+                    </div>
+                    <input type="text" class="form-control" [formControlName]="i" value="{{deviceComms.value.Value}}">
+                  </div>
+                  <div class="input-group input-group-sm"
+                    *ngIf="updateCommsFormGroup.controls['deviceComms'].controls[i].invalid">
+                    <div class="input-group-prepend"></div>
+                    <small class="small-error">{{getErrorMessage(updateCommsFormGroup.controls['deviceComms'].controls[i].value,infoCommFields, i)}}</small>
+                  </div>
+                </div>
+                <div class="mb-3" *ngIf="deviceComms.value.FieldType==='DropDown'">
+                  <div class="input-group input-group-sm">
+                    <div class="input-group-prepend">
+                      <span class="input-group-text justify-content-end"
+                        id="inputGroup-sizing-sm">{{deviceComms.value.Description}}</span>
+                    </div>
+                    <select [formControlName]="i" #mySelect class="custom-select" (change)="onDropDownChange(deviceComms, mySelect.value)">
+                      <option *ngFor="let dropDownInfo of deviceComms.value.OptionValues | keyvalue  :KeepOrder"
+                        ngValue="{{dropDownInfo.value}}">
+                        {{dropDownInfo.key}}</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="mb-3" *ngIf="deviceComms.value.FieldType==='DateTime'">
+                  <div class="input-group input-group-sm">
+                    <div class="input-group-prepend">
+                      <span class="input-group-text justify-content-end"
+                        id="inputGroup-sizing-sm">{{deviceComms.value.Description}}</span>
+                    </div>
+                    <input  step="1" class="form-control" type="datetime-local" value="{{deviceComms.value.Value}}" disabled>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </form>
+<!--</div>-->

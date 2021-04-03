@@ -1,0 +1,122 @@
+import { Component, OnInit, Output, EventEmitter, Input } from '@angular/core';
+import { AuthService } from '../auth/auth.service';
+import { NgForm, FormGroup, FormControl, FormBuilder, FormArray } from '@angular/forms';
+import { SearchFields, SearchResult } from './search.model';
+import { StageNotification } from '../stages/stage.notification';
+import { ToastrService } from 'ngx-toastr';
+
+@Component({
+  selector: 'app-search',
+  templateUrl: './search.component.html',
+  styleUrls: ['./search.component.css']
+})
+export class SearchComponent extends StageNotification implements OnInit {
+  @Output() myEvent = new EventEmitter<any>();
+  defaultSearch = '0';
+  deviceTypeDictionary: any = {};
+  searchDictionary: any = {};
+  filterDictionary: any = {};
+  emitResult: any;
+  SearchResult: SearchResult;
+  SearchResults: SearchResult[] = [];
+  searchForm: FormGroup;
+  @Input() searchFields: SearchFields;
+  editedSite: boolean;
+
+  constructor(private authService: AuthService, private formBuilder: FormBuilder, public toastrService: ToastrService) {
+    super(toastrService);
+  }
+
+  ngOnInit() {
+    this.searchDictionary = this.getSearchElements();
+    this.filterDictionary = this.getFilterElements();
+    this.searchForm = new FormGroup({
+      'searchFilter': new FormControl(this.searchDictionary[0].Name),
+      'searchText': new FormControl(''),
+      'filters': new FormArray([])
+    }
+    );
+
+    this.addFilters();
+  }
+
+  addFilters() {
+    this.filterDictionary = this.getFilterElements();
+    Object.entries(this.filterDictionary).forEach(
+      ([key, value]) => {
+        (<FormArray>this.searchForm.get('filters')).push(new FormControl(''));
+      }
+    );
+  }
+
+  getFilterControls() {
+    return (<FormArray>this.searchForm.get('filters'));
+  }
+
+  onSearch() {
+    let search = true;
+    if (this.editedSite) {
+      search = false;
+      this.showConfirmToast('You are editing sites. If you leave, your changes will be lost. Leave?').onAction.subscribe(x => {
+        if (x.title === 'Yes') {
+          this.editedSite = false;
+          this.onSearch();
+        }
+      });
+    }
+    if (search) {
+      this.SearchResults = [];
+      for (const c in this.searchForm.controls) {
+        if (this.searchForm.controls.hasOwnProperty(c)) {
+          this.SearchResult = {};
+          if (this.searchForm.get(c) instanceof FormArray) {
+            for (let i = 0; i < this.searchForm.get(c).value.length; i++) {
+              this.SearchResult = {};
+              this.SearchResult.Name = this.filterDictionary[i].Name;
+              this.SearchResult.Value = this.searchForm.get(c).value[i];
+              this.SearchResults.push(this.SearchResult);
+            }
+          } else {
+            this.SearchResult = {};
+            if (c === 'searchFilter') {
+              this.SearchResult.Name = this.searchForm.get(c).value;
+              this.SearchResult.Value = this.searchForm.get('searchText').value;
+              this.SearchResults.push(this.SearchResult);
+            }
+          }
+        }
+      }
+      this.myEvent.emit(
+        this.SearchResults
+      );
+      console.log(this.searchForm);
+    }
+  }
+
+  isAuthenticated() {
+    return this.authService.isAuthenticated();
+  }
+
+  getSearchElements() {
+    let index = 0;
+    for (let i = 0; i < this.searchFields.SearchFields.length; i++) {
+      if (this.searchFields.SearchFields[i].FieldType === 'Search') {
+        this.searchDictionary[index] = this.searchFields.SearchFields[i];
+        index++;
+      }
+    }
+
+    return this.searchDictionary;
+  }
+
+  getFilterElements() {
+    let index = 0;
+    for (let i = 0; i < this.searchFields.SearchFields.length; i++) {
+      if (this.searchFields.SearchFields[i].FieldType === 'Filter') {
+        this.filterDictionary[index] = this.searchFields.SearchFields[i];
+        index++;
+      }
+    }
+    return this.filterDictionary;
+  }
+}

@@ -1,0 +1,109 @@
+import { AfterViewInit, Component, ElementRef, EventEmitter, OnInit, Output, ViewChild } from '@angular/core';
+import { FormControl, FormGroup } from '@angular/forms';
+import { NgbPopover, NgbPopoverConfig } from '@ng-bootstrap/ng-bootstrap';
+import { DeviceService } from '../device.service';
+import { Device } from '../shared/device.model';
+
+@Component({
+  selector: 'app-device-link',
+  templateUrl: './device-link.component.html',
+  styleUrls: ['./device-link.component.css']
+})
+export class DeviceLinkComponent implements OnInit, AfterViewInit {
+
+  @ViewChild('closeModal') closeModal: ElementRef;
+  @Output() linkDeviceEvent = new EventEmitter<any>();
+
+  linkFormGroup: FormGroup;
+  cancelDeviceLink: boolean;
+  linkDevice: Device;
+
+  devices: Device[];
+  clonedDevices: Device[];
+  private strFilter: string = "";
+  private minkeyLen = 1;
+  private maxValues: number[];
+  private maxWidth: any = [];
+
+  @ViewChild(NgbPopover)
+  private popover: NgbPopover;
+
+  constructor(private config: NgbPopoverConfig, private deviceService: DeviceService) {
+    config.autoClose = 'outside';
+    config.placement = 'auto';
+  }
+
+  ngOnInit() {
+    this.setDeviceLinkForm();
+    this.onGetDevices();
+  }
+
+  ngAfterViewInit(): void {
+    this.popover.hidden.subscribe($event => {
+      this.strFilter = "";
+      this.onGetDevices();
+    });
+  }
+
+  setDeviceLinkForm() {
+    this.linkFormGroup = new FormGroup({
+      valueText: new FormControl("")
+    });
+  }
+
+  onSave() {
+    this.linkDeviceEvent.emit(this.linkDevice);
+    this.resetForm();
+  }
+
+  resetForm() {
+    const el: HTMLElement = this.closeModal.nativeElement as HTMLElement;
+    el.click();
+
+    this.linkFormGroup.reset();
+    this.setDeviceLinkForm();
+    this.cancelDeviceLink = false;
+  }
+
+  clickCancel() {
+    this.cancelDeviceLink = !this.cancelDeviceLink;
+  }
+
+  onRowSelect(row: any) {
+    this.selectRow(row);
+    this.popover.close();
+    this.strFilter = "";
+    this.onGetDevices();
+  }
+
+  selectRow(row: any) {
+    this.linkDevice = row;
+    this.linkFormGroup.get('valueText').setValue(`${this.linkDevice.serialNumber} - ${this.linkDevice.deviceType.deviceTypeName}`);
+  }
+
+  onGetDevices(refresh = false) {
+    this.deviceService.getDevices(refresh).then((devices) => {
+      if (devices.devices != undefined) {
+        // To show devices list there is only in DEFAULT SITE
+        this.devices = devices.devices.filter(device => device.deviceSite.siteID == 0);
+        this.clonedDevices = JSON.parse(JSON.stringify(this.devices));
+      }
+    });
+  }
+
+  onFilterChange(sFilter: string) {
+    if (sFilter == null)
+      return;
+    if (sFilter == "") {
+      this.onGetDevices(true);
+    } else if (sFilter.length >= this.minkeyLen) {
+      sFilter = sFilter.toLowerCase();
+      this.devices = [];
+      for (let device of this.clonedDevices) {
+        let label = `No Site|${device.plantNumber}|${device.serialNumber}|${device.deviceType.deviceTypeName}`.toLowerCase();
+        if (label.indexOf(sFilter) > -1)
+          this.devices.push(device);
+      }
+    }
+  }
+}

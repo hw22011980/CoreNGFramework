@@ -1,0 +1,13 @@
+export class Firmware {
+  public id: number;
+  public fwCode: string;
+  public fwName: string;
+  public fwVersion: string;
+  public fwEdition: string;
+  public fwDescription: string;
+  public deviceTypeId: string;
+  public deviceTypeName: string;
+  public status: string;
+  public statusDescription: string;
+  public fwImage: string;
+}

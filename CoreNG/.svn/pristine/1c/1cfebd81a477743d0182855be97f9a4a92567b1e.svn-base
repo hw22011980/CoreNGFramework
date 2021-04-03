@@ -1,0 +1,147 @@
+
+.div-breather{
+  margin-right: 13%;
+}
+
+.breadcrumb-item
+{
+    font-size: medium;
+}
+
+.switch {
+    position: relative; 
+    display: inline-block;
+    width: 50px;
+    height: 24px;
+  }
+  
+  .switch input { 
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+  
+  .slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    -webkit-transition: .4s;
+    transition: 1s;
+  }
+  
+  .slider:before {
+    position: absolute;
+    content: "";
+    height: 20px;
+    width: 20px;
+    left: 2px;
+    bottom: 2px;
+    background-color: white;
+    -webkit-transition: .4s;
+    transition: .4s;
+  }
+  
+  input:checked + .slider {
+    background-color: rgb(74, 214, 69);
+  }
+  
+  input:focus + .slider {
+    box-shadow: 0 0 1px #2196F3;
+  }
+  
+  input:checked + .slider:before {
+    -webkit-transform: translateX(26px);
+    -ms-transform: translateX(26px);
+    transform: translateX(26px);
+  }
+  
+  /* Rounded sliders */
+  .slider.round {
+    border-radius: 34px;
+  }
+  
+  .slider.round:before {
+    border-radius: 50%;
+  }
+  #lblConnect
+  {
+      left: 25px;
+      color: darkgray;
+
+      
+  }
+
+  .loader {
+    border: 4px solid #f3f3f3; /* Light grey */
+    border-top: 4px solid #3498db; /* Blue */
+    border-radius: 80%;
+    width: 20px;
+    height: 20px;
+    animation: spin 2s linear infinite;
+    margin-top: 2px;
+    margin-right: -35px;
+  }
+  
+  @keyframes spin {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+
+
+  a.disabled {
+    pointer-events: none;
+    cursor: default;
+    color:gray;
+ }
+
+ button{
+  margin-left: 20px;
+}
+
+.btn-outline-primary,
+.btn-outline-primary:hover
+{
+  margin-top: 1px;
+  min-width: 80px;
+  max-width: 80px;
+  min-height: 23px;
+  max-height: 23px;
+  padding: 0;
+  font-weight: bold;
+  text-decoration:white;  
+}
+
+.custom-color,
+.custom-color:hover
+{
+  color: rgb(0,123,255); /*bootstrap button primary blue value*/
+  text-decoration: none;
+  pointer-events: none;
+}
+
+.btn 
+{
+  border-radius: 30px;
+  width: 85px;
+}
+
+a { 
+  color: #700c0e;
+  font-weight: bold;
+  font-size: 14px;
+  text-transform: uppercase;
+}
+
+a:hover {
+  color: #584e4e;
+  cursor: pointer;
+  text-decoration: none;
+}

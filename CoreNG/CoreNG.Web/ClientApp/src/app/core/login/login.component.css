@@ -1,0 +1,52 @@
+
+ .loginbg { 
+    background-image: url("/assets/images/bg/meter_autoline.jpg");
+    height: 100%; 
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+  }
+
+  .login-box {
+      padding: 75px 0px 0px 100px;
+  }
+
+  .login-card {
+    width: 25rem;
+  }
+
+  .login-button {
+    width: 100%;
+  }
+
+  .border-md {
+    border-top-color:  #700c0e !important;
+    border-top-width: thick;
+  }
+
+  a {
+    color: #5a5555;
+    text-decoration: none;
+    background-color: transparent;
+  }
+  
+  a:hover {
+    color: #5a5555;
+    text-decoration: underline;
+  }
+
+  .box {
+    display: flex;
+    align-items:center;
+    margin-left: 30%;
+ }
+
+ .about {
+  display: flex;
+  align-items:center;
+}
+.btn 
+{
+  border-radius: 30px;
+}
+  

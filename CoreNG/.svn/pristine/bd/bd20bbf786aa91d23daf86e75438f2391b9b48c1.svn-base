@@ -1,0 +1,5 @@
+import {Firmware} from './firmware.model';
+
+export class Firmwares {
+  public firmwares: Firmware[];
+}

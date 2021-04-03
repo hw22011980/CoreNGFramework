@@ -1,0 +1,370 @@
+import { Component, OnInit, ElementRef, ViewChild, Output, EventEmitter, Input } from '@angular/core';
+import { DeviceService } from '../device.service';
+import { FormGroup, FormArray, FormControl, Validators } from '@angular/forms';
+import { CreateField, CreateFieldResults, CreateFieldResult } from '../shared/device-create.model';
+import { DeviceCommsCreateFieldsTCPTCPDefinition } from './fields/device-create-comms-fields-tcp-tcp';
+import { DeviceCommsCreateFieldsHDLCTCPDefinition } from './fields/device-create-comms-fields-hdlc-tcp';
+import { DeviceCommsCreateFieldsHDLCSerialDefinition } from './fields/device-create-comms-fields-hdlc-serial';
+import { DevicInfoFieldsDefinition as DeviceInfoFieldsDefinition } from './fields/device-create-info-fields';
+import { DeviceSecurityandDLMSSettingsDefinition } from './fields/device-create-security-dlms-settings-fields';
+
+@Component({
+  selector: 'app-device-create',
+  templateUrl: './device-create.component.html',
+  styleUrls: ['./device-create.component.css']
+})
+export class DeviceCreateComponent implements OnInit {
+  showTabs = true;
+  @Input() enabledSite = true;
+  @Input() siteID = 0;
+  @ViewChild('closeModal') closeModal: ElementRef;
+  @Output() myEvent = new EventEmitter<any>();
+
+  createDeviceTabs: string[];
+  activeTab: string;
+  activeTabIndex: number;
+  meterTypeDictionary: any;
+  communicationProfileDictionary: any;
+  supportingLayerDictionary: any;
+  createFormGroup: FormGroup;
+
+  deviceCreateFields: CreateField[];
+  deviceCreateField: CreateField;
+
+  deviceCreateCommFields: CreateField[];
+  deviceCreateCommField: CreateField;
+
+  deviceCreateSecurityFields: CreateField[];
+  deviceCreateSecurityField: CreateField;
+
+  createDeviceInformationDictionary: any = {};
+  createDeviceCommDictionary: any = {};
+  createDeviceSecurityDictionary: any = {};
+
+  createResults: CreateFieldResult[];
+  createResult: CreateFieldResult = {};
+
+  deviceInfoDefinition: DeviceInfoFieldsDefinition = new DeviceInfoFieldsDefinition;
+
+  deviceCommsFieldsTCPTCPDefinition: DeviceCommsCreateFieldsTCPTCPDefinition = new DeviceCommsCreateFieldsTCPTCPDefinition;
+  deviceCommsFieldsHDLCTCPDefinition: DeviceCommsCreateFieldsHDLCTCPDefinition = new DeviceCommsCreateFieldsHDLCTCPDefinition;
+  deviceCommsFieldsHDLCSerialDefinition: DeviceCommsCreateFieldsHDLCSerialDefinition = new DeviceCommsCreateFieldsHDLCSerialDefinition;
+
+  deviceSecurityDefinition: DeviceSecurityandDLMSSettingsDefinition = new DeviceSecurityandDLMSSettingsDefinition;
+
+  cancelDeviceCreate: boolean;
+
+  summaryDictionary: any = {};
+  constructor(private deviceService: DeviceService) { }
+
+  ngOnInit() {
+    this.createDeviceTabs = ['deviceInfo', 'deviceComms', 'deviceSecurity', 'summary'];
+    this.communicationProfileDictionary = this.deviceService.getDeviceCommunicationProfileDictionary();
+    this.supportingLayerDictionary = this.deviceService.getDeviceSupportingLayerDictionary();
+    this.setDeviceCreateForm();
+  }
+
+  setDeviceCreateForm() {
+    // set device create information needed
+    this.setDeviceCreateInfo();
+    this.setDeviceCommsOnCommsProfile('TCP', 'TCP');
+    this.setDeviceSecurityInfo();
+
+    // create form groups
+    this.createFormGroup = new FormGroup({
+      'deviceInfo': new FormArray([]),
+      'deviceComms': new FormArray([]),
+      'deviceSecurity': new FormArray([])
+    });
+
+    // set create information to form groups
+    this.setFormGroup(this.deviceCreateFields, this.createDeviceTabs[0]);
+    this.setFormGroup(this.deviceCreateCommFields, this.createDeviceTabs[1]);
+    this.setFormGroup(this.deviceCreateSecurityFields, this.createDeviceTabs[2]);
+
+    // reset active tab to first tab
+    this.activeTab = this.createDeviceTabs[0];
+    this.activeTabIndex = 0;
+    this.onDeviceCommsChanges();
+  }
+
+  setDeviceCreateInfo() {
+    this.deviceCreateFields = this.deviceInfoDefinition.getDeviceInfoFields(this.deviceService,this.siteID,this.enabledSite);
+  }
+
+  setDeviceCommsOnCommsProfile(communicationProfile: string, supportingLayer: string) {
+    this.deviceCreateCommFields = [];
+
+    if (communicationProfile === this.communicationProfileDictionary['TCP']) {
+      this.deviceCreateCommFields = this.deviceCommsFieldsTCPTCPDefinition.getDeviceCommsFields(this.deviceService);
+    } else if (communicationProfile === this.communicationProfileDictionary['HDLC']) {
+      if (supportingLayer === this.supportingLayerDictionary['TCP']) {
+        this.deviceCreateCommFields = this.deviceCommsFieldsHDLCTCPDefinition.getDeviceCommsFields(this.deviceService);
+      } else if (supportingLayer === this.supportingLayerDictionary['Serial']) {
+        this.deviceCreateCommFields = this.deviceCommsFieldsHDLCSerialDefinition.getDeviceCommsFields(this.deviceService);
+      }
+    }
+  }
+
+  setDeviceSecurityInfo() {
+    this.deviceCreateSecurityFields = this.deviceSecurityDefinition.getDeviceDLMSAssociationFields(this.deviceService);
+  }
+
+  setFormGroup(dictionaryCreate: CreateField[], formArrayName: string) {
+    for (let i = 0; i < dictionaryCreate.length; i++) {
+      if (dictionaryCreate[i].FieldType === 'Text') {
+        if (dictionaryCreate[i].Required) {
+          (<FormArray>this.createFormGroup.get(formArrayName))
+            .push(new FormControl({ value: dictionaryCreate[i].DefaultValue.toString(), disabled: !dictionaryCreate[i].Enable },
+              [Validators.required, Validators.maxLength(dictionaryCreate[i].MaxLength),
+               Validators.pattern(this.getTextPatterValidator(dictionaryCreate[i].AlphaNumeric)),
+               this.WhitespaceValidator]));
+        } else {
+          (<FormArray>this.createFormGroup.get(formArrayName))
+            .push(new FormControl({ value: dictionaryCreate[i].DefaultValue.toString(), disabled: !dictionaryCreate[i].Enable },
+              [Validators.maxLength(dictionaryCreate[i].MaxLength),
+               Validators.pattern(this.getTextPatterValidator(dictionaryCreate[i].AlphaNumeric))]));
+        }
+      }
+
+      if (dictionaryCreate[i].FieldType === 'Password') {
+        if (dictionaryCreate[i].Required) {
+          (<FormArray>this.createFormGroup.get(formArrayName))
+            .push(new FormControl({ value: dictionaryCreate[i].DefaultValue.toString(), disabled: !dictionaryCreate[i].Enable },
+              [Validators.required, Validators.maxLength(dictionaryCreate[i].MaxLength),
+              this.WhitespaceValidator]));
+        } else {
+          (<FormArray>this.createFormGroup.get(formArrayName))
+            .push(new FormControl({ value: dictionaryCreate[i].DefaultValue.toString(), disabled: !dictionaryCreate[i].Enable },
+              Validators.maxLength(dictionaryCreate[i].MaxLength)));
+        }
+      }
+
+      if (dictionaryCreate[i].FieldType === 'IPAddress') {
+        if (dictionaryCreate[i].Required) {
+          (<FormArray>this.createFormGroup.get(formArrayName))
+            .push(new FormControl({ value: dictionaryCreate[i].DefaultValue.toString(), disabled: !dictionaryCreate[i].Enable },
+              [Validators.required, Validators.maxLength(dictionaryCreate[i].MaxLength),
+              this.WhitespaceValidator, Validators.pattern(this.IpAddressValidator())]));
+        } else {
+          (<FormArray>this.createFormGroup.get(formArrayName))
+            .push(new FormControl({ value: dictionaryCreate[i].DefaultValue.toString(), disabled: !dictionaryCreate[i].Enable },
+              [Validators.maxLength(dictionaryCreate[i].MaxLength), Validators.pattern(this.IpAddressValidator())]));
+        }
+      }
+
+      if (dictionaryCreate[i].FieldType === 'Number') {
+        if (dictionaryCreate[i].Required) {
+          (<FormArray>this.createFormGroup.get(formArrayName))
+            .push(new FormControl({ value: dictionaryCreate[i].DefaultValue.toString(), disabled: !dictionaryCreate[i].Enable },
+              [Validators.required, Validators.pattern('^[0-9]*$'),
+              Validators.min(dictionaryCreate[i].MinLength), Validators.max(dictionaryCreate[i].MaxLength)]));
+        } else {
+          (<FormArray>this.createFormGroup.get(formArrayName))
+            .push(new FormControl({ value: dictionaryCreate[i].DefaultValue.toString(), disabled: !dictionaryCreate[i].Enable },
+              [Validators.min(dictionaryCreate[i].MinLength), Validators.max(dictionaryCreate[i].MaxLength)]));
+        }
+      }
+
+      if (dictionaryCreate[i].FieldType === 'DropDown') {
+        (<FormArray>this.createFormGroup.get(formArrayName))
+          .push(new FormControl({ value: dictionaryCreate[i].DefaultValue.toString(), disabled: !dictionaryCreate[i].Enable }));
+      }
+    }
+  }
+
+  onNext() {
+    if (this.activeTabIndex < this.createDeviceTabs.length - 1 && this.activeTabIndex >= 0) {
+      this.activeTabIndex++;
+    }
+
+    if (this.activeTab === this.createDeviceTabs[this.createDeviceTabs.length - 1]) {
+      this.processCreateDevice();
+    }
+
+    this.activeTab = this.createDeviceTabs[this.activeTabIndex];
+  }
+
+  processCreateDevice() {
+    this.createResults = [];
+    for (const control in this.createFormGroup.controls) {
+      if (this.createFormGroup.controls.hasOwnProperty(control)) {
+        if (this.createFormGroup.get(control) instanceof FormArray) {
+          for (let i = 0; i < (<FormArray>this.createFormGroup.get(control)).controls.length; i++) {
+            this.createResult = {};
+            if (control === this.createDeviceTabs[0]) {
+              this.createResult.Name = this.deviceCreateFields[i].Name;
+              this.createResult.Value = (<FormArray>this.createFormGroup.get(control)).controls[i].value.trim();
+            } else if (control === this.createDeviceTabs[1]) {
+              this.createResult.Name = this.deviceCreateCommFields[i].Name;
+              this.createResult.Value = (<FormArray>this.createFormGroup.get(control)).controls[i].value.trim();
+            } else if (control === this.createDeviceTabs[2]) {
+              this.createResult.Name = this.deviceCreateSecurityFields[i].Name;
+              this.createResult.Value = (<FormArray>this.createFormGroup.get(control)).controls[i].value.trim();
+            }
+
+            this.createResults.push(this.createResult);
+          }
+        }
+      }
+    }
+
+    this.myEvent.emit(this.createResults);
+    this.resetForm();
+  }
+
+  resetForm() {
+    const el: HTMLElement = this.closeModal.nativeElement as HTMLElement;
+    el.click();
+
+    this.resetFormArray(this.createFormGroup.controls['deviceComms'] as FormArray);
+    this.createFormGroup.reset();
+    this.setDeviceCreateForm();
+    this.cancelDeviceCreate = false;
+  }
+
+  clickCancel() {
+    if (this.cancelDeviceCreate) {
+      this.cancelDeviceCreate = false;
+    } else {
+      this.cancelDeviceCreate = true;
+    }
+  }
+
+  isTabValid(): boolean {
+    if (this.activeTab !== this.createDeviceTabs[this.createDeviceTabs.length - 1]) {
+      return this.createFormGroup.controls[this.activeTab].valid;
+    }
+    return false;
+  }
+
+  isFirstPage(): boolean {
+    if (this.activeTab === this.createDeviceTabs[0]) {
+      return true;
+    }
+    return false;
+  }
+
+  onPrevious() {
+    if (this.activeTabIndex < this.createDeviceTabs.length && this.activeTabIndex >= 1) {
+      this.activeTabIndex--;
+    }
+
+    if (this.activeTab === this.createDeviceTabs[this.createDeviceTabs.length - 1]) {
+      this.createResults = [];
+    }
+
+    this.activeTab = this.createDeviceTabs[this.activeTabIndex];
+  }
+
+  showAndActivateTab(tabName: string) {
+    if (tabName === this.activeTab) {
+      return 'show active';
+    }
+  }
+
+  onDeviceCommsChanges() {
+    // communication profile on change listener
+    this.createFormGroup.controls[this.createDeviceTabs[1]].get('0').
+      valueChanges.subscribe(data => {
+        this.setDeviceCommsOnCommsProfile(
+          this.createFormGroup.controls[this.createDeviceTabs[1]].get('0').value.toString(),
+          this.createFormGroup.controls[this.createDeviceTabs[1]].get('1').value.toString());
+        this.resetFormArray(this.createFormGroup.get('deviceComms') as FormArray);
+        this.setFormGroup(this.deviceCreateCommFields, this.createDeviceTabs[1]);
+        this.onDeviceCommsChanges();
+      });
+
+    // supporting layer on change listener
+    this.createFormGroup.controls[this.createDeviceTabs[1]].get('1').
+      valueChanges.subscribe(data => {
+        this.setDeviceCommsOnCommsProfile(
+          this.createFormGroup.controls[this.createDeviceTabs[1]].get('0').value.toString(),
+          this.createFormGroup.controls[this.createDeviceTabs[1]].get('1').value.toString());
+        this.resetFormArray(this.createFormGroup.get('deviceComms') as FormArray);
+        this.setFormGroup(this.deviceCreateCommFields, this.createDeviceTabs[1]);
+        this.onDeviceCommsChanges();
+      });
+  }
+
+  resetFormArray(formArray: FormArray) {
+    while (formArray.length !== 0) {
+      formArray.removeAt(0);
+    }
+  }
+
+  // validators
+  public KeepOrder() {
+    return 0;
+  }
+
+  public IpAddressValidator(): RegExp {
+    // tslint:disable-next-line: max-line-length
+    return /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
+  }
+
+  public WhitespaceValidator(control: FormControl) {
+    const isWhitespace = (control.value || '').trim().length === 0;
+    const isValid = !isWhitespace;
+    return isValid ? null : { 'whitespace': true };
+  }
+
+  public showRequiredIndicator(required: boolean) {
+    if (required) {
+      return 'required-field';
+    } else {
+      return 'pl-4';
+    }
+  }
+
+  public omit_invalid_characters(event, deviceInfo: any, index: number) {
+    const key = event.charCode;
+    if (deviceInfo[index].FieldType === 'Text' && !deviceInfo[index].AlphaNumeric) {
+      return ((key >= 48 && key <= 57) || (key >= 65 && key <= 90) || (key >= 97 && key <= 122) || key === 45 || key === 95);
+    } else if (deviceInfo[index].FieldType === 'Text' && deviceInfo[index].AlphaNumeric) {
+      return ((key >= 48 && key <= 57) || (key >= 65 && key <= 90) || (key >= 97 && key <= 122));
+    } else if (deviceInfo[index].FieldType === 'Number') {
+      return ((key > 47 && key < 58));
+    }
+  }
+
+  public getErrorMessage(value, deviceCreate: any, index: number): String {
+    // invalid input is detected, return appropriate message
+    if (value === '') {
+      return deviceCreate[index].Description + ' cannot be blank';
+    } else if (value > deviceCreate[index].MaxLength && deviceCreate[index].FieldType === 'Number') {
+      return 'Value must not exceed ' + deviceCreate[index].MaxLength;
+    } else if (value < deviceCreate[index].MinLength && deviceCreate[index].FieldType === 'Number') {
+      return 'Value must not be less than ' + deviceCreate[index].MinLength;
+    } else if (deviceCreate[index].FieldType === 'IPAddress') {
+      return deviceCreate[index].Description + ' is in invalid format ';
+    } else if (deviceCreate[index].FieldType === 'Text' && !deviceCreate[index].AlphaNumeric) {
+      return 'Value contains invalid characters. <br/> Valid characters are: A-Z a-z 0-9 - _';
+    } else if (deviceCreate[index].FieldType === 'Text' && deviceCreate[index].AlphaNumeric) {
+      return 'Value contains invalid characters. <br/> Valid characters are: A-Z a-z 0-9';
+    }
+    return deviceCreate[index].Description + ' is invalid';
+  }
+
+  public getCreateSummary () {
+    for (let i = 0; i < this.deviceCreateFields.length; i++) {
+      if (this.deviceCreateFields[i].Name  === 'DeviceStatus' &&
+        (<FormArray>this.createFormGroup.get('deviceInfo')).controls[i].value.trim() === 'AwaitingInstallation' ) {
+        this.summaryDictionary[this.deviceCreateFields[i].Description] = 'Awaiting Installation';
+      } else {
+        this.summaryDictionary[this.deviceCreateFields[i].Description] =
+        (<FormArray>this.createFormGroup.get('deviceInfo')).controls[i].value.trim();
+      }
+    }
+
+    return this.summaryDictionary;
+  }
+
+  getTextPatterValidator(alphaNumeric: boolean) {
+    if (!alphaNumeric) {
+      return ('^[a-zA-Z0-9-_]*$');
+    } else {
+      return ('^[a-zA-Z0-9]*$');
+    }
+  }
+}

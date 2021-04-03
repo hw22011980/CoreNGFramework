@@ -1,0 +1,156 @@
+[
+  {
+    "id": "1",
+    "name": "Perencanaan",
+    "enable": false,
+    "visible": false,
+    "uiTemplate": -1,
+    "selected": 1,
+    "children": [
+      {
+        "id": "11",
+        "name": "Perencanaan Tahunan",
+        "enable": false,
+        "visible": false,
+        "uiTemplate": 0,
+        "selected": 1
+      }
+    ]
+  },
+  {
+    "id": "2",
+    "name": "Penganggaran",
+    "enable": false,
+    "visible": false,
+    "uiTemplate": -1,
+    "selected": 1,
+    "children": [
+      {
+        "id": "21",
+        "name": "Rencana Kerja Anggaran",
+        "enable": false,
+        "visible": false,
+        "uiTemplate": 1,
+        "selected": 1
+      }
+    ]
+  },
+  {
+    "id": "3",
+    "name": "Penatausahaan Penerimaan",
+    "enable": false,
+    "visible": false,
+    "uiTemplate": -1,
+    "selected": 1,
+    "children": [
+      {
+        "id": "31",
+        "name": "Tanda Bukti Penerimaan",
+        "enable": false,
+        "visible": false,
+        "uiTemplate": 1,
+        "selected": 1
+      },
+      {
+        "id": "32",
+        "name": "Surat Tanda Penerimaan",
+        "enable": false,
+        "visible": false,
+        "uiTemplate": 1,
+        "selected": 1
+      },
+      {
+        "id": "33",
+        "name": "BKU Penerimaan",
+        "enable": false,
+        "visible": false,
+        "uiTemplate": 1,
+        "selected": 1
+      }
+    ]
+  },
+  {
+    "id": "4",
+    "name": "Penatausahaan Pengeluaran",
+    "enable": false,
+    "visible": false,
+    "uiTemplate": -1,
+    "selected": 1,
+    "children": [
+      {
+        "id": "41",
+        "name": "Penerimaan UP",
+        "enable": false,
+        "visible": false,
+        "uiTemplate": 0,
+        "selected": 1
+      },
+      {
+        "id": "42",
+        "name": "Bukti Pengeluaran Kas",
+        "enable": false,
+        "visible": false,
+        "uiTemplate": 1,
+        "selected": 1
+      },
+      {
+        "id": "43",
+        "name": "Surat Pertanggungjawaban",
+        "enable": false,
+        "visible": false,
+        "uiTemplate": 1,
+        "selected": 1
+      },
+      {
+        "id": "44",
+        "name": "Surat Permintaan Pembayaran",
+        "enable": false,
+        "visible": false,
+        "uiTemplate": 1,
+        "selected": 1
+      },
+      {
+        "id": "45",
+        "name": "Surat Perintah Membayar",
+        "enable": false,
+        "visible": false,
+        "uiTemplate": 1,
+        "selected": 1
+      },
+      {
+        "id": "46",
+        "name": "Surat Perintah Pengeluaran Dana",
+        "enable": false,
+        "visible": false,
+        "uiTemplate": 0,
+        "selected": 1
+      },
+      {
+        "id": "47",
+        "name": "Pengembalian Belanja",
+        "enable": false,
+        "visible": false,
+        "uiTemplate": 1,
+        "selected": 1
+      }
+    ]
+  },
+  {
+    "id": "5",
+    "name": "Pertanggungjawaban",
+    "enable": false,
+    "visible": false,
+    "uiTemplate": -1,
+    "selected": 1,
+    "children": [
+      {
+        "id": "51",
+        "name": "Laporan Operasional",
+        "enable": false,
+        "visible": false,
+        "uiTemplate": 0,
+        "selected": 1
+      }
+    ]
+  }
+]

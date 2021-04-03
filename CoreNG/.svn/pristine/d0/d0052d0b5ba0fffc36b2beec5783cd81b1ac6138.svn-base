@@ -1,0 +1,38 @@
+.pointer {
+    cursor: pointer;
+}
+
+.btn {
+    border-radius: 30px;
+}
+
+.badge {
+    border-radius: 30px;
+}
+
+.text-left {
+    text-align: left;
+}
+
+.text-right {
+    text-align: right;
+}
+
+.btn-delete {
+    background-color: #700c0e;
+    color: white;
+}
+
+.btn-unlink {
+    padding: .25rem .5rem;
+    font-size: .8005rem;
+    line-height: 1.2;
+    width: 100px;
+}
+
+.title {
+    text-transform: uppercase;
+    text-decoration: none;
+    color: #171819;
+    opacity: 0.75;
+}

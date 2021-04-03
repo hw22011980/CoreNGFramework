@@ -1,0 +1,8 @@
+import { ErrorResponse } from './error-response.model';
+
+export class Result {
+    devicePlantNumber: string;
+    deviceSerialNumber: string;
+    status: string;
+    errorResponse: ErrorResponse;
+}

@@ -1,0 +1,6 @@
+export class DeviceDLMSAssociationRequest {
+    public ClientId: string;
+    public Password: string;
+    public ApplicationContext: any;
+    public AuthenticationMethod: any;
+}

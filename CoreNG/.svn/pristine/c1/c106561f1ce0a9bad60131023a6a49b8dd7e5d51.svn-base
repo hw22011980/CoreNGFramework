@@ -1,0 +1,55 @@
+import { Component, ElementRef, EventEmitter, OnInit, Output, ViewChild } from '@angular/core';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { PublishDetailsService } from 'src/app/services/publish-details.service';
+
+@Component({
+  selector: 'app-custom-import',
+  templateUrl: './custom-import.component.html',
+  styleUrls: ['./custom-import.component.css']
+})
+
+
+export class CustomImportComponent implements OnInit {
+  @Output() onhandleFileInput = new EventEmitter<File>();
+  @Output() onImport = new EventEmitter<any>();
+  @Output() onClose = new EventEmitter<any>();
+  @ViewChild('labelImport')
+  labelImport: ElementRef;  
+  isFileChosen : boolean;
+  filename: string;
+  formImport: FormGroup; 
+  fileToUpload: File = null;  
+  ngOnInit() {
+    this.isFileChosen = false; 
+    this.filename = '';
+  }
+
+
+  constructor(private emitDetails: PublishDetailsService) {
+    this.formImport = new FormGroup({
+      importFile: new FormControl('', Validators.required)
+    });
+  }
+  close()
+  {
+    this.fileToUpload = null;
+    this.labelImport.nativeElement.innerText = '';
+    this.onClose.emit();
+  }
+  onFileChange(files: FileList) {
+
+    this.labelImport.nativeElement.innerText = Array.from(files)
+    .map(f => f.name)
+    .join(', ');
+    this.fileToUpload = files.item(0);
+    this.onhandleFileInput.emit(this.fileToUpload);
+  }
+
+  import(): void {
+    if(this.fileToUpload !=null)
+      this.onImport.emit(event);
+    else
+      this.onImport.emit(null);
+    this.fileToUpload = null;
+  }
+}

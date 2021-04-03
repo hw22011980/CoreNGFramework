@@ -1,0 +1,53 @@
+import { CreateField } from '../../shared/device-create.model';
+import { DeviceService } from '../../device.service';
+
+let deviceCreateSecurityFields: CreateField[];
+let deviceCreateSecurityField: CreateField;
+
+export class DeviceSecurityandDLMSSettingsDefinition {
+    public getDeviceDLMSAssociationFields(deviceService: DeviceService): CreateField[] {
+        deviceCreateSecurityFields = [];
+
+        deviceCreateSecurityField = {};
+        deviceCreateSecurityField.Name = 'ClientId';
+        deviceCreateSecurityField.Description = 'Client Id';
+        deviceCreateSecurityField.Enable = true;
+        deviceCreateSecurityField.FieldType = 'Number';
+        deviceCreateSecurityField.Required = true;
+        deviceCreateSecurityField.MaxLength = 256;
+        deviceCreateSecurityField.MinLength = 1;
+        deviceCreateSecurityField.DefaultValue = '';
+        deviceCreateSecurityFields.push(deviceCreateSecurityField);
+
+        deviceCreateSecurityField = {};
+        deviceCreateSecurityField.Name = 'Password';
+        deviceCreateSecurityField.Description = 'Password';
+        deviceCreateSecurityField.Enable = true;
+        deviceCreateSecurityField.FieldType = 'Password';
+        deviceCreateSecurityField.MaxLength = 50;
+        deviceCreateSecurityField.DefaultValue = '';
+        deviceCreateSecurityFields.push(deviceCreateSecurityField);
+
+        deviceCreateSecurityField = {};
+        deviceCreateSecurityField.Name = 'ApplicationContext';
+        deviceCreateSecurityField.Description = 'Application Context';
+        deviceCreateSecurityField.Enable = true;
+        deviceCreateSecurityField.FieldType = 'DropDown';
+        deviceCreateSecurityField.OptionValues = deviceService.getApplicationContextDictionary();
+        deviceCreateSecurityField.Required = true;
+        deviceCreateSecurityField.DefaultValue = 'LN';
+        deviceCreateSecurityFields.push(deviceCreateSecurityField);
+
+        deviceCreateSecurityField = {};
+        deviceCreateSecurityField.Name = 'AuthenticationMethod';
+        deviceCreateSecurityField.Description = 'AuthenticationMethod';
+        deviceCreateSecurityField.Enable = true;
+        deviceCreateSecurityField.FieldType = 'DropDown';
+        deviceCreateSecurityField.OptionValues = deviceService.getAuthenticationMethodDictionary();
+        deviceCreateSecurityField.Required = true;
+        deviceCreateSecurityField.DefaultValue = 'NO_SECURITY';
+        deviceCreateSecurityFields.push(deviceCreateSecurityField);
+
+        return deviceCreateSecurityFields;
+    }
+}

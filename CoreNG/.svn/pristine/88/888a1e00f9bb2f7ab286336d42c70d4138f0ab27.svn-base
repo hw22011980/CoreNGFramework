@@ -1,0 +1,6 @@
+import {DeviceDLMSKey} from './device-key-dlms.model';
+
+
+export class DeviceDLMSKeys {
+  deviceDLMSKeys: DeviceDLMSKey[];
+}

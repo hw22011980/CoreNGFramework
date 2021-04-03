@@ -1,0 +1,132 @@
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { AuthService } from '../../auth/auth.service';
+import { PublishDetailsService } from 'src/app/services/publish-details.service';
+import { Envelop, EventMessage, ICrossComponentMsg } from 'src/app/common/cross-component-msg';
+import { Subscription } from 'rxjs';
+import { Router } from '@angular/router';
+import { StageNotification } from 'src/app/stages/stage.notification';
+import { ToastrService } from 'ngx-toastr';
+
+@Component({
+  selector: 'app-header',
+  templateUrl: './header.component.html',
+  styleUrls: ['./header.component.css']
+})
+export class HeaderComponent extends StageNotification implements OnInit, OnDestroy, ICrossComponentMsg {
+
+  currentUser: string;
+  disableClick = true;
+  editedSite: boolean;
+  envelop: Envelop;
+  xComponentSubscription: Subscription;
+
+  constructor(private authService: AuthService,
+    private router: Router,
+    public toastrService: ToastrService,
+    private emitDetails: PublishDetailsService) { super(toastrService); }
+
+  ngOnInit() {
+  }
+
+  setEnvelop(data) {
+  }
+
+  isAuthenticated() {
+    this.currentUser = this.authService.getCurrentUser();
+    this.xComponentSubscription = this.emitDetails.messageEmitter.subscribe(data => this.onSubscribedData(data));
+    // need to also check if reload for the resources is done, else it will prematurely display the header
+    if (this.authService.isAuthenticated() && JSON.parse(localStorage.getItem('showHeader')) && JSON.parse(localStorage.getItem('reload'))) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  ngOnDestroy() {
+    this.xComponentSubscription.unsubscribe();
+  }
+
+  onSubscribedData(data: any) {
+    if (data instanceof Envelop) {
+      const tempdata = data as Envelop;
+      switch (tempdata.from) {
+        case 'StageTableComponent':
+        case 'StageBasicComponent':
+        case 'DisplayProfileComponent':
+        case 'DeviceNavigationComponent':
+        case 'DeviceSetupComponent':
+          if (tempdata.get() instanceof EventMessage) {
+            let status = tempdata.get() as EventMessage;
+            if (status.EventName === 'disableClick')
+              this.disableClick = status.Value;
+          }
+          break;
+        case 'SiteListComponent':
+          if (tempdata.get() instanceof EventMessage) {
+            let status = tempdata.get() as EventMessage;
+            if (status.EventName === 'editedSite')
+              this.editedSite = status.Value;
+          }
+          break;
+        case 'ToolsComponent':
+          if (tempdata.get() instanceof EventMessage) {
+            let status = tempdata.get() as EventMessage;
+            if (status.EventName === 'disableClick')
+              this.disableClick = status.Value;
+          }
+          break;
+        default:
+          break;
+      }
+    }
+  }
+
+  logout() {
+    let followLinkGo = true;
+    if (this.editedSite) {
+      followLinkGo = false;
+      this.showConfirmToast('You are editing sites. If you leave, your changes will be lost. Leave?').onAction.subscribe(x => {
+        if (x.title === 'Yes') {
+          this.editedSite = false;
+          this.logout();
+        }
+      });
+    }
+
+    if (followLinkGo) {
+      this.authService.logout();
+    }
+  }
+
+  routeLink(value) {
+    let followLinkGo = true;
+    if (this.editedSite && value != 2) {
+      followLinkGo = false;
+      this.showConfirmToast('You are editing sites. If you leave, your changes will be lost. Leave?').onAction.subscribe(x => {
+        if (x.title === 'Yes') {
+          this.editedSite = false;
+          this.routeLink(value);
+        }
+      });
+    }
+
+    if (followLinkGo) {
+      switch (value) {
+        case 1:
+          this.router.navigate(['/devices']);
+          break;
+        case 2:
+          this.router.navigate(['/sites']);
+          break;
+        case 3:
+          this.router.navigate(['/keys']);
+          break;
+        case 4:
+          this.router.navigate(['/firmwares']);
+          break;
+        default:
+          break;
+      }
+    }
+  }
+}

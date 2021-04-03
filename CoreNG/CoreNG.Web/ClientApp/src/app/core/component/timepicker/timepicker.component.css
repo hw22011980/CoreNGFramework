@@ -1,0 +1,56 @@
+app-timepicker {
+    font-size: .875rem;
+}
+
+.tp {
+    display: flex;
+    align-items: center;
+}
+
+.tp-input-container {
+    width: 4.650em;
+}
+
+.tp-input {
+    text-align: center;
+    border-radius: 0;
+    padding: .25rem .5rem;
+    height: calc(1.5em + .5rem + 2px);
+    font-size: .875rem;
+    line-height: 1.5;
+}
+
+.tp-hour, .tp-minute, .tp-second, .tp-prefix, .tp-postfix, .tp-clear {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-around;
+}
+
+.tp-spacer {
+    width: 0.699em;
+    text-align: center;
+}
+
+.tp-spacer-text {
+    width: 0.5em;
+    text-align: center;
+}
+
+.btn.btn-link {
+    padding: 0 0 !important;
+    font-size: 12px;
+}
+
+.btn.btn-outline-primary{
+    font-size: 12px;
+}
+
+.link-footer { 
+    color:#007bff; 
+    text-decoration:underline; 
+    cursor:pointer;
+    display: inline-block;
+    vertical-align: middle; 
+    line-height: normal;
+}

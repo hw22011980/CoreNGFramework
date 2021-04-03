@@ -1,0 +1,528 @@
+import { Component, OnInit, ChangeDetectorRef, DoCheck, OnDestroy } from '@angular/core';
+import { DeviceService } from '../device.service';
+import { SetupService } from '../setup.service';
+import { Devices } from '../shared/devices.model';
+import { ActivatedRoute, Router } from '@angular/router';
+import { Device } from '../shared/device.model';
+import { HttpParams } from '@angular/common/http';
+import { InformationFields, InformationField } from 'src/app/info-display/info-display.model';
+import { DeviceConnectStatus } from '../shared/device-connect-status';
+import { LoaderConnectService } from 'src/app/services/loader-connect-service.component';
+import { PublishDetailsService } from 'src/app/services/publish-details.service';
+import { InterComponentDataService } from 'src/app/services/intercomponent-data-service';
+import { DeviceSetupComponent, Menu } from '../device-setup/device-setup.component';
+import { DeviceCommActions } from '../shared/device-comm-actions';
+import { Subscription } from 'rxjs';
+import { StageNotification } from 'src/app/stages/stage.notification';
+import { DeviceInfoComponent } from '../device-info/device-info.component';
+import { ToastrService } from 'ngx-toastr';
+import { Envelop, EventMessage, ICrossComponentMsg, NavIdentification, NavTreeNodeStatus, SelectedStage } from 'src/app/common/cross-component-msg';
+
+
+@Component({
+  selector: 'app-device-navigation',
+  templateUrl: './device-navigation.component.html',
+  styleUrls: ['./device-navigation.component.css']
+})
+export class DeviceNavigationComponent extends StageNotification implements OnInit, OnDestroy, ICrossComponentMsg {
+  deviceSetupComponentRef: any;
+  deviceInfoComponentRef: DeviceInfoComponent;
+  devices: Devices;
+  device: Device;
+  devicePayload: Device; // for update
+  deviceId: string;
+  plantNumber: string;
+  existMetadata: boolean;
+  infoModel: InformationFields = {};
+  infoFields: InformationField[] = [];
+  infoField: InformationField = {};
+
+  infoCommModel: InformationFields = {};
+  infoCommFields: InformationField[] = [];
+  infoCommField: InformationField = {};
+
+  formData: FormData;
+  actionResponse: any;
+  isChecked = false;
+  disableClick = true;
+  setupButtonVisible: boolean;
+  enableSetup: boolean;
+  selectedStage: SelectedStage;
+  commActions: DeviceCommActions;
+  xComponentSubscription: Subscription;
+  envelop: Envelop;
+  childNodes: NavTreeNodeStatus;
+  toolsSlideInOffline = false;
+
+  interval: any;
+
+  connecLabelStatus: string;
+  constructor(private deviceService: DeviceService,
+    private setupService: SetupService,
+    private activatedRoute: ActivatedRoute,
+    private router: Router,
+    public loader: LoaderConnectService,
+    private changeDetector: ChangeDetectorRef,
+    private emitDetails: PublishDetailsService,
+    private interComponentData: InterComponentDataService<any>,
+    public toastrService: ToastrService) {
+    super(toastrService);
+    this.commActions = new DeviceCommActions(this.deviceService);
+    this.setEnvelop(null);
+  }
+  // tslint:disable-next-line: use-life-cycle-interface
+  ngAfterViewChecked() { this.changeDetector.detectChanges(); }
+
+  ngOnInit() {
+    this.selectedStage = new SelectedStage();
+    this.childNodes = new NavTreeNodeStatus();
+    this.toolsSlideInOffline = false;
+    this.setEnvelop(null);
+
+    this.deviceId = this.activatedRoute.snapshot.params['id'];
+    this.onGetDevices();
+    const connection = new DeviceConnectStatus();
+    this.isChecked = connection.CheckConnectionStatus();
+
+    this.xComponentSubscription = this.emitDetails.messageEmitter.subscribe(data => this.onSubscribedData(data));
+    this.connecLabelStatus = 'CONNECT';
+    this.setupButtonVisible = this.interComponentData.GetItemValue('setupButtonVisible');
+  }
+
+  ngOnDestroy() {
+    this.xComponentSubscription.unsubscribe();
+  }
+
+  setEnvelop(data) {
+    this.envelop = new Envelop('DeviceSetupComponent', 'DeviceNavigationComponent',
+      'Send selected router path to DeviceSetupComponent', data);
+  }
+
+
+  startConnectionTimer() {
+    if (this.enableSetup && !this.setupButtonVisible) { // if btn connect visible
+      const connection = new DeviceConnectStatus();
+      if (!this.interval) {
+        this.interval = setInterval(() => {
+          //console.log('Timer start');
+          this.loader.disableFeature();
+          this.onGetDevices();
+          this.loader.enableFeature();
+        }, parseInt(localStorage.getItem('checkingConnectionInterval'), 0) * 1000);
+      }
+    } else {
+      this.stopTimer();
+    }
+  }
+  stopTimer() {
+    if (this.interval) {
+      clearInterval(this.interval);
+      this.interval = null;
+      // console.log('Timer stop');
+    }
+  }
+
+  onSubscribedData(data: any) {
+
+    if (data instanceof Envelop) {
+      const tempdata = data as Envelop;
+      switch (tempdata.from) {
+        case 'AppComponent':
+          if (tempdata.get() instanceof NavIdentification) {
+            this.onNavigationEvents(tempdata.get() as NavIdentification);
+            this.loader.disableFeature();
+          }
+          break;
+        case 'StageTableComponent':
+        case 'StageBasicComponent':
+        case 'DisplayProfileComponent':
+        case 'DeviceNavigationComponent':
+          if (tempdata.get() instanceof EventMessage) {
+            let status = tempdata.get() as EventMessage;
+            if (status.EventName === 'disableClick')
+              this.disableClick = status.Value;
+          }
+          break;
+        case 'DeviceSetupComponent':
+          if (tempdata.get() instanceof SelectedStage)
+            this.selectedStage = tempdata.get();
+          if (tempdata.get() instanceof EventMessage) {
+            let status = tempdata.get() as EventMessage;
+            if (status.EventName === 'disableClick')
+              this.disableClick = status.Value;
+          }
+          break;
+        case 'DeviceInfoComponent':
+          if (tempdata.get() instanceof EventMessage) {
+            this.enableSetup = (tempdata.get() as EventMessage).Value;
+            this.setupButtonVisible = this.enableSetup;
+          }
+          break;
+        case 'ToolsComponent':
+          if (tempdata.get() instanceof EventMessage) {
+            let status = tempdata.get() as EventMessage;
+            if (status.EventName === 'disableClick')
+              this.disableClick = status.Value;
+          }
+          break;
+        default:
+          break;
+      }
+    }
+  }
+
+
+  onGetDevices() {
+    // device-info and device-nav is async, so need implemented in both files
+    let params = new HttpParams();
+    params = params.append('deviceId', String(this.deviceId));
+
+    this.deviceService.getDevices(true, params).then((devices) => {
+      this.device = devices.devices[0];
+      this.SetEnableSetupByCheckingDB(this.device.deviceId);
+      localStorage.setItem('device', JSON.stringify(this.device));
+      const connection = new DeviceConnectStatus();
+      connection.isConnected = this.device.connectionStatus;
+      connection.plantNumber = this.device.plantNumber;
+      connection.deviceId = this.device.deviceId;
+      localStorage.setItem('previousId', JSON.stringify(connection));
+      this.plantNumber = this.device.plantNumber.toString();
+
+
+      this.isChecked = connection.CheckConnectionStatus();
+      if (!this.isChecked) {
+        this.envelop.set(connection);
+        this.emitDetails.messageEmitter.next(this.envelop);
+        this.stopTimer();
+        this.selectedStage.StageName = '';
+        this.selectedStage.StageId = '';
+      }
+
+      this.refreshNavBar();
+    },
+      (error: any) => {
+      });
+  }
+
+  SetEnableSetupByCheckingDB(deviceId: any) {
+    if (deviceId != null) {
+      // device-navigation is async with device-info, so need to implement in both files;
+      this.setupService.GetMenus(deviceId).then(
+        data => {
+          this.enableSetup = (data.toString() !== '');
+
+          const objemenu = {
+            id: deviceId,
+            menu: data
+          };
+          localStorage.setItem('menu', JSON.stringify(objemenu));
+          localStorage.setItem('enableSetup', String(this.enableSetup));
+          const connection = new DeviceConnectStatus();
+          this.isChecked = connection.CheckConnectionStatus();
+          if (this.isChecked) {
+            this.startConnectionTimer();
+          }
+        }
+      );
+
+    }
+  }
+
+  private onNavigationEvents(value: NavIdentification) {
+    if (!value.Url.includes('setup')) {
+      // tslint:disable-next-line: deprecation
+      this.onRouterLinkClick(event, 1);
+    }
+
+    if (value.Name === 'setup') {
+      this.setupButtonVisible = false;
+    }
+  }
+
+  slideToConnectToMeter(event: any) {
+    if (event.currentTarget.checked) {
+      this.connect();
+      this.startConnectionTimer();
+    } else {
+      this.disconnect();
+      this.stopTimer();
+    }
+  }
+
+  getPreviousSelectedItems() {
+    if (this.deviceId != null) {
+      // device-navigation is async with device-info, so need to implement in both files;
+      this.setupService.GetMenus(this.deviceId).then(
+        data => {
+          const temp = { id: this.deviceId, menu: data };
+          localStorage.setItem('menu', JSON.stringify(temp));
+          const strmenu = localStorage.getItem('menu');
+          const objmenu = JSON.parse(strmenu);
+          this.childNodes.CheckedStageIDArray = [];
+          if (objmenu !== null) {
+            var menu = objmenu.menu;
+            objmenu.menu.forEach(element => {
+              element.children.forEach(child => {
+                if (child.selected == 1)
+                  this.childNodes.CheckedStageIDArray.push(child.id)
+              });
+            });
+            this.envelop.set(this.childNodes);
+            this.emitDetails.messageEmitter.next(this.envelop);
+            this.envelop.set(new EventMessage('updateNavTree', objmenu.menu));
+            this.emitDetails.messageEmitter.next(this.envelop);
+          }
+        }
+      );
+
+    }
+
+  }
+
+
+  private connect() {
+    this.loader.enableFeature();
+    this.envelop.set(new EventMessage('disableClick', false));
+    this.emitDetails.messageEmitter.next(this.envelop);
+    const connection = new DeviceConnectStatus();
+    /*Connect to MDCCS*/
+    let params = new HttpParams();
+    // params = params.append('deviceAction', 'connect');
+    params = params.append('plantNumber', this.plantNumber);
+    params = params.append('cleanPreviousSession', 'True');
+
+
+    this.deviceService.setDevices(true, params, 'connect').subscribe((StandardResponse) => {
+      this.devicePayload = StandardResponse.data;
+      // console.log(this.devicePayload);
+
+      if (StandardResponse.success) {
+        this.isChecked = true;
+        connection.isConnected = true;
+        connection.plantNumber = this.plantNumber;
+        localStorage.setItem('previousId', JSON.stringify(connection));
+        //this.reloadPage.sendFunctionEvent(this.interComponentData.GetItemValue("LastLoadedPage"));
+        this.envelop.set(connection);
+        this.emitDetails.messageEmitter.next(this.envelop);
+        this.loader.disableFeature();
+        this.getPreviousSelectedItems();
+
+      }
+      else {
+        connection.isConnected = false;
+        connection.plantNumber = this.plantNumber;
+        localStorage.setItem('previousId', JSON.stringify(connection));
+        this.isChecked = false;
+      }
+    }, (error: any) => {
+      connection.isConnected = false;
+      connection.plantNumber = this.plantNumber;
+      localStorage.setItem('previousId', JSON.stringify(connection));
+      this.isChecked = false;
+      console.log(connection.isConnected + ' because ' + error);
+      if (error.error) {
+        this.showErrorToast(error.error.message);
+      } else {
+        this.showErrorToast(error.message);
+      }
+      this.envelop.set(new EventMessage('disableClick', true));
+      this.emitDetails.messageEmitter.next(this.envelop);
+      this.envelop.set(connection);
+      this.emitDetails.messageEmitter.next(this.envelop);
+    }, () => {
+      this.reloadTreeMenu();
+      this.setNavigationRouteToDefault();
+      this.envelop.set(new EventMessage('disableClick', true));
+      this.emitDetails.messageEmitter.next(this.envelop);
+    });
+  }
+
+  disconnect() {
+    this.loader.enableFeature();
+    this.envelop.set(new EventMessage('disableClick', false));
+    this.emitDetails.messageEmitter.next(this.envelop);
+    const connection = new DeviceConnectStatus();
+    this.isChecked = false;
+    let params = new HttpParams();
+    params = params.append('plantNumber', this.plantNumber);
+    this.deviceService.setDevices(true, params, 'disconnect').subscribe((StandardResponse) => {
+      this.devicePayload = StandardResponse.data;
+      if (StandardResponse.success) {
+        this.isChecked = false;
+        this.loader.disableFeature();
+        this.toolsSlideInOffline = false;
+        this.envelop.set(new EventMessage('toolsSlideInOffline', this.toolsSlideInOffline));
+        this.emitDetails.messageEmitter.next(this.envelop);
+
+      } else { this.isChecked = true; }
+    }, (error: any) => {
+      console.log(error);
+      if (error.error) {
+        this.showErrorToast(error.error.message);
+      } else {
+        this.showErrorToast(error.message);
+      }
+      this.envelop.set(new EventMessage('disableClick', true));
+      this.emitDetails.messageEmitter.next(this.envelop);
+    }, () => {
+      connection.isConnected = false;
+      connection.plantNumber = this.plantNumber;
+      localStorage.setItem('previousId', JSON.stringify(connection));
+      //this.reloadPage.sendFunctionEvent(this.interComponentData.GetItemValue('LastLoadedPage'));
+      this.refreshNavBar();
+      this.reloadTreeMenu();
+      this.envelop.set(connection);
+      this.emitDetails.messageEmitter.next(this.envelop);
+      this.setNavigationRouteToDefault();
+      this.envelop.set(new EventMessage('disableClick', true));
+      this.emitDetails.messageEmitter.next(this.envelop);
+    });
+
+  }
+  setNavigationRouteToDefault() {
+    this.router.navigate([`/devices/${this.deviceId}/setup`]);
+    this.selectedStage.SetupName = '';
+    this.selectedStage.StageName = '';
+    this.selectedStage.StageId = '';
+    this.selectedStage.SetupId = '';
+  }
+
+  getPlantNumber() {
+    this.plantNumber = this.device.plantNumber.toString();
+  }
+
+  isConnected() {
+    if (this.isChecked) {
+      this.connecLabelStatus = 'CONNECTED';
+    } else {
+      this.connecLabelStatus = 'CONNECT';
+    }
+
+    return this.isChecked;
+  }
+
+  refreshNavBar() {
+    this.router.onSameUrlNavigation = 'reload';
+  }
+
+  onRouterLinkClick(event, value) {
+    let followLinkGo = true;
+    if (this.deviceSetupComponentRef && this.deviceSetupComponentRef instanceof DeviceSetupComponent) {
+      let hasEditedDataDifference = false;
+      if (this.deviceSetupComponentRef.frmConfig && this.deviceSetupComponentRef.child.isEditing) {
+        hasEditedDataDifference = this.deviceSetupComponentRef.child.hasEditedDataDifference();
+      }
+      if (this.deviceSetupComponentRef.frmConfig && this.deviceSetupComponentRef.child.isEditing && hasEditedDataDifference) {
+        followLinkGo = false;
+        this.showConfirmToast('You are editing a stage. If you leave, your changes will be lost. Leave?').onAction.subscribe(x => {
+          if (x.title === 'Yes') {
+            this.deviceSetupComponentRef.child.isEditing = false;
+            this.onRouterLinkClick(event, value);
+          }
+        });
+      }
+    }
+
+    if (followLinkGo) {
+      this.setupButtonVisible = false;
+      this.interComponentData.SetItemValue('setupButtonVisible', this.setupButtonVisible);
+      switch (value) {
+        case 1:
+          this.setupButtonVisible = true;
+          this.interComponentData.SetItemValue('setupButtonVisible', this.setupButtonVisible);
+          this.commActions.autoDisconnectLastConnection();
+          if (this.isChecked) { this.isChecked = false; }
+          this.router.navigate([`/devices/${this.deviceId}`]);
+          break;
+        case 2:
+          this.selectedStage.StageName = '';
+          this.selectedStage.StageId = '';
+          if (this.selectedStage.SetupName !== '') {
+            this.selectedStage.SetupName = '';
+            this.selectedStage.SetupId = '';
+          }
+
+          this.refreshTreeMenu();
+          this.router.navigate([`/devices/${this.deviceId}/setup`]);
+          break;
+        case 3:
+          this.selectedStage.SetupName = '';
+          this.selectedStage.SetupId = '';
+
+          this.refreshTreeMenu();
+          this.router.navigate([`/devices/${this.deviceId}/setup/${this.selectedStage.StageName}`]);
+          break;
+        case 4:
+          this.selectedStage.StageName = '';
+          this.selectedStage.StageId = '';
+          if (this.selectedStage.SetupName !== '') {
+            this.selectedStage.SetupName = '';
+            this.selectedStage.SetupId = '';
+          }
+          this.router.navigate([`/devices/${this.deviceId}/setup`]);
+          break;
+        default:
+          break;
+      }
+    }
+  }
+
+  onSetupClick(event) {
+    if (this.deviceId != null) {
+      // device-navigation is async with device-info, so need to implement in both files;
+      this.setupService.GetMenus(this.deviceId).then(
+        data => {
+          const temp = { id: this.deviceId, menu: data };
+          localStorage.setItem('menu', JSON.stringify(temp));
+          const strmenu = localStorage.getItem('menu');
+          const objmenu = JSON.parse(strmenu);
+          this.envelop.set(new EventMessage('updateNavTree', objmenu.menu));
+          this.emitDetails.messageEmitter.next(this.envelop);
+          let checkIds = new NavTreeNodeStatus();
+          checkIds.CheckedStageIDArray = [];
+          objmenu.menu.forEach(parent => {
+            parent.children.forEach(child => {
+              if (child.selected == 1) checkIds.CheckedStageIDArray.push(child.id);
+            });
+          });
+          this.envelop.set(checkIds);
+          this.emitDetails.messageEmitter.next(this.envelop);
+
+
+          this.emitDetails.messageEmitter.next(this.envelop);
+          this.envelop.set(new EventMessage('toolsSlideInOffline', true));
+        }
+      );
+    }
+
+  }
+
+  private refreshTreeMenu() {
+    if (!this.interComponentData.ContainsKey('refreshPage')) {
+      this.interComponentData.AddItem('refreshPage', true);
+    } else {
+      this.interComponentData.SetItemValue('refreshPage', true);
+    }
+    this.envelop.set(this.selectedStage);
+    this.emitDetails.messageEmitter.next(this.envelop);
+  }
+
+  private reloadTreeMenu() {
+    this.selectedStage = new SelectedStage();
+    this.refreshTreeMenu();
+  }
+
+  onActivate(componentRef) {
+    if (componentRef instanceof DeviceSetupComponent) {
+      this.deviceSetupComponentRef = componentRef;
+    }
+    if (componentRef instanceof DeviceInfoComponent) {
+      this.deviceInfoComponentRef = componentRef;
+      this.deviceInfoComponentRef.deviceUpdatedEvent.subscribe(val => {
+        this.device = val;
+        this.plantNumber = val.plantNumber;
+      });
+    }
+  }
+}
+

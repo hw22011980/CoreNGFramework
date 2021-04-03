@@ -1,0 +1,31 @@
+import { NgModule } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FirmwareListComponent } from './firmware-list/firmware-list.component';
+import { FirmwareInfoComponent } from './firmware-info/firmware-info.component';
+import { FirmwareComponent } from './firmware.component';
+import { FirmwareRoutingModule } from './firmware-routing.module';
+import { FormsModule } from '@angular/forms';
+import { SearchModule } from '../search/search.module';
+import { SpinnerModule } from '../spinner/spinner.module';
+import { InfoDisplayModule } from '../info-display/info-display.module';
+import { WhiteSpaceFirmwareValidator } from './shared/whitespace.firmware.validator';
+import { FileExtensionFirmwareValidator } from './shared/fileextenstion.firmware.validator';
+
+@NgModule({
+  declarations: [
+    FirmwareComponent,
+    FirmwareListComponent,
+    FirmwareInfoComponent,
+    WhiteSpaceFirmwareValidator,
+    FileExtensionFirmwareValidator
+  ],
+  imports: [
+    CommonModule,
+    FirmwareRoutingModule,
+    FormsModule,
+    SearchModule,
+    SpinnerModule,
+    InfoDisplayModule
+  ]
+})
+export class FirmwareModule { }

@@ -1,0 +1,29 @@
+import { Device } from 'src/app/devices/shared/device.model';
+
+export class Site {
+    siteID: number;
+    siteName: string;
+    numberofDevices: number;
+    devices: Device[];
+}
+
+export enum SiteMode {
+    INSERT = 11,
+    UPDATE = 12,
+    DELETE = 13
+}
+
+export class SiteRequest {
+    mode: SiteMode;
+    siteID: number;
+    siteName: string;
+}
+
+export class DeviceIDRequest {
+    deviceId: number;
+}
+
+export class DevicesSiteRequest {
+    siteID: number;
+    devices: DeviceIDRequest[] = [];
+}

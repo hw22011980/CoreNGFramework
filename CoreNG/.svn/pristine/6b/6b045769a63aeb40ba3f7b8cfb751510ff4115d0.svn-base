@@ -1,0 +1,6 @@
+import { Result } from './result.model';
+
+export class ActionResponseInfo {
+    action: string;
+    result: Result[];
+}

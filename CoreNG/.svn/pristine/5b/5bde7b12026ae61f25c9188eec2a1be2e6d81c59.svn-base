@@ -1,0 +1,171 @@
+import { InformationField, InformationFields } from 'src/app/info-display/info-display.model';
+import { DeviceService } from '../../device.service';
+import { Device } from '../../shared/device.model';
+
+let infoCommFields: InformationField[] = [];
+let infoCommField: InformationField = {};
+
+export class DeviceCommsFieldsTCPTCPDefinition {
+
+    getDeviceCommsFields(deviceService: DeviceService, device: Device): InformationField[] {
+        infoCommFields = [];
+
+        infoCommField = {};
+        infoCommField.Name = 'CommunicationProfile';
+        infoCommField.Description = 'Communication Profile';
+        infoCommField.Value = 'TCP';
+        infoCommField.DisplayValue = 'TCP';
+        infoCommField.Editable = true;
+        infoCommField.FieldType = 'DropDown';
+        infoCommField.OptionValues = deviceService.getDeviceCommunicationProfileDictionary();
+        infoCommField.Required = true;
+        infoCommFields.push(infoCommField);
+
+        infoCommField = {};
+        infoCommField.Name = 'SupportingLayer';
+        infoCommField.Description = 'Supporting Layer';
+        infoCommField.Value = 'TCP';
+        infoCommField.DisplayValue = 'TCP';
+        infoCommField.Editable = false;
+        infoCommField.FieldType = 'DropDown';
+        infoCommField.OptionValues = deviceService.getDeviceSupportingLayerDictionary();
+        infoCommField.Required = false;
+        infoCommFields.push(infoCommField);
+
+        infoCommField = {};
+        infoCommField.Name = 'BaudRate';
+        infoCommField.Description = 'Baud Rate';
+        infoCommField.FieldType = 'DropDown';
+        infoCommField.Editable = false;
+        infoCommField.OptionValues = deviceService.getBaudRateDictionary();
+        infoCommField.Required = false;
+        infoCommField.Value = device.deviceComms.baudRate;
+        infoCommFields.push(infoCommField);
+
+        infoCommField = {};
+        infoCommField.Name = 'Parity';
+        infoCommField.Description = 'Parity';
+        infoCommField.Value = device.deviceComms.parity;
+        infoCommField.Editable = false;
+        infoCommField.FieldType = 'DropDown';
+        infoCommField.OptionValues = deviceService.getParityDictionary();
+        infoCommField.Required = false;
+        infoCommFields.push(infoCommField);
+
+        infoCommField = {};
+        infoCommField.Name = 'StopBits';
+        infoCommField.Description = 'Stop Bits';
+        infoCommField.Value = device.deviceComms.stopBits.toString();
+        infoCommField.DisplayValue = 'None';
+        infoCommField.Editable = false;
+        infoCommField.FieldType = 'DropDown';
+        infoCommField.OptionValues = deviceService.getStopBitsDictionary();
+        infoCommField.Required = false;
+        infoCommFields.push(infoCommField);
+
+        infoCommField = {};
+        infoCommField.Name = 'DataBits';
+        infoCommField.Description = 'Data Bits';
+        infoCommField.Value = device.deviceComms.dataBits.toString();
+        infoCommField.DisplayValue = 'None';
+        infoCommField.Editable = false;
+        infoCommField.FieldType = 'DropDown';
+        infoCommField.OptionValues = deviceService.getDataBitsDictionary();
+        infoCommField.Required = false;
+        infoCommFields.push(infoCommField);
+
+        infoCommField = {};
+        infoCommField.Name = 'DLMSLogical';
+        infoCommField.Description = 'Logical';
+        infoCommField.Value = device.deviceComms.dlmsLogical.toString();
+        infoCommField.Editable = true;
+        infoCommField.FieldType = 'Number';
+        infoCommField.Required = true;
+        infoCommField.MaxLength = 999999;
+        infoCommField.MinLength = 0;
+        infoCommFields.push(infoCommField);
+
+        infoCommField = {};
+        infoCommField.Name = 'DLMSPhysical';
+        infoCommField.Description = 'Physical';
+        infoCommField.Value = device.deviceComms.dlmsPhysical.toString();
+        infoCommField.Editable = true;
+        infoCommField.FieldType = 'Number';
+        infoCommField.Required = true;
+        infoCommField.MaxLength = 999999;
+        infoCommField.MinLength = 0;
+        infoCommFields.push(infoCommField);
+
+        infoCommField = {};
+        infoCommField.Name = 'DLMSAddressScheme';
+        infoCommField.Description = 'Address Scheme (Byte)';
+        infoCommField.Value = device.deviceComms.dlmsAddressScheme.toString();
+        infoCommField.Editable = true;
+        infoCommField.FieldType = 'DropDown';
+        infoCommField.OptionValues = deviceService.getDLMSAddressSchemeDictionary();
+        infoCommField.Required = true;
+        infoCommFields.push(infoCommField);
+
+        infoCommField = {};
+        infoCommField.Name = 'RetryTimeout';
+        infoCommField.Description = 'Retry Timeout (ms)';
+        infoCommField.Value = device.deviceComms.retryTimeout;
+        infoCommField.Editable = true;
+        infoCommField.FieldType = 'Number';
+        infoCommField.Required = true;
+        infoCommField.MaxLength = 999999;
+        infoCommField.MinLength = 0;
+        infoCommFields.push(infoCommField);
+
+        infoCommField = {};
+        infoCommField.Name = 'Timeout';
+        infoCommField.Description = 'Timeout (ms)';
+        infoCommField.Value = device.deviceComms.timeout;
+        infoCommField.Editable = true;
+        infoCommField.FieldType = 'Number';
+        infoCommField.Required = true;
+        infoCommField.MaxLength = 999999;
+        infoCommField.MinLength = 0;
+        infoCommFields.push(infoCommField);
+
+        infoCommField = {};
+        infoCommField.Name = 'IPAddress';
+        infoCommField.Description = 'IP Address';
+        infoCommField.Value = device.deviceComms.ipAddress == null ? '' : device.deviceComms.ipAddress;
+        infoCommField.Editable = true;
+        infoCommField.FieldType = 'IPAddress';
+        infoCommField.Required = true;
+        infoCommFields.push(infoCommField);
+
+        infoCommField = {};
+        infoCommField.Name = 'Port';
+        infoCommField.Description = 'Port';
+        infoCommField.Value = device.deviceComms.port.toString();
+        infoCommField.Editable = true;
+        infoCommField.FieldType = 'Number';
+        infoCommField.Required = true;
+        infoCommField.MaxLength = 65535;
+        infoCommField.MinLength = 1601;
+        infoCommFields.push(infoCommField);
+
+        infoCommField = {};
+        infoCommField.Name = 'LastPushReceived';
+        infoCommField.Description = 'Last Push Received';
+        infoCommField.Value = device.deviceComms.lastPushReceived;
+        infoCommField.Editable = false;
+        infoCommField.FieldType = 'DateTime';
+        infoCommField.Required = true;
+        infoCommFields.push(infoCommField);
+
+        infoCommField = {};
+        infoCommField.Name = 'LastSuccessfulComms';
+        infoCommField.Description = 'Last Successful Comms';
+        infoCommField.Value = device.deviceComms.lastSuccessfulComms;
+        infoCommField.Editable = false;
+        infoCommField.FieldType = 'DateTime';
+        infoCommField.Required = true;
+        infoCommFields.push(infoCommField);
+
+        return infoCommFields;
+    }
+}

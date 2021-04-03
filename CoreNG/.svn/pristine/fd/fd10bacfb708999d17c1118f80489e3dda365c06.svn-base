@@ -1,0 +1,17 @@
+.header{
+    letter-spacing: 3px;     
+    color: darkgrey;
+    font-size: 9pt;
+ }
+
+ .label{
+    text-align: right;
+ }
+
+ .search-body{
+   height:100%;
+ }
+ .btn 
+ {
+    border-radius: 30px;
+ }

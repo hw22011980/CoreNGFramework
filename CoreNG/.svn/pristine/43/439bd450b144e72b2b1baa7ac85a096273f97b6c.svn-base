@@ -1,0 +1,24 @@
+<div class="container-fluid">
+    <app-spinner-setup class="center" *ngIf="loader.getLoaderStatus() ; else displayCompareTable"></app-spinner-setup>
+</div>
+<ng-template #displayCompareTable>
+    <div>
+        <ng-container *ngIf="raw_data">
+            <div *ngIf="!raw_data.success" class="alert alert-danger" role="alert">
+                {{raw_data.message}}
+            </div>
+            <ng-container *ngIf="raw_data.success">
+                <div *ngIf="this.data.length == 0" class="alert alert-info" role="alert">
+                    {{raw_data.message}}
+                </div>
+                <app-tree-table *ngIf="this.data.length > 0" #treeTable [data]="this.data" [configs]="configs"
+                    (selectedValues)="onSelectedValue($event)"></app-tree-table>
+            </ng-container>
+        </ng-container>
+        <ng-container *ngIf="error_msg">
+            <div class="alert alert-danger" role="alert">
+                {{error_msg}}
+            </div>
+        </ng-container>
+    </div>
+</ng-template>

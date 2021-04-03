@@ -1,0 +1,418 @@
+import { HttpParams } from '@angular/common/http';
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
+import { ToastrService } from 'ngx-toastr';
+import { ActionResponseService } from 'src/app/action-response/action-response.service';
+import { ActionResponse } from 'src/app/action-response/shared/action-response.model';
+import { PagerService } from 'src/app/core/pager/pager.service';
+import { SearchFields, SearchField, SearchResult } from 'src/app/search/search.model';
+import { InterComponentDataService } from 'src/app/services/intercomponent-data-service';
+import { DeviceIDRequest, DevicesSiteRequest, Site } from 'src/app/sites/shared/site.model';
+import { SiteService } from 'src/app/sites/site.service';
+import { SpinnerService } from 'src/app/spinner/spinner.service';
+import { DeviceLinkComponent } from '../device-link/device-link.component';
+import { DeviceService } from '../device.service';
+import { DeviceCommActions } from '../shared/device-comm-actions';
+import { DeviceRequestComms } from '../shared/device-comms-request.model';
+import { CreateFieldResult } from '../shared/device-create.model';
+import { DeviceDLMSAssociationRequest } from '../shared/device-dlms-association-request.model';
+import { DeviceRequest } from '../shared/device-request.model';
+import { Device } from '../shared/device.model';
+
+@Component({
+  selector: 'app-devices-per-site',
+  templateUrl: './devices-per-site.component.html',
+  styleUrls: ['./devices-per-site.component.css']
+})
+export class DevicesPerSiteComponent implements OnInit {
+
+  @ViewChild('form') form;
+  searchModel: SearchFields = {};
+  searchFields: SearchField[] = [];
+  searchField: SearchField = {};
+
+  searchValues: SearchResult[] = [];
+
+  fileSelected: File;
+  devices: Device[];
+  clonedDevices: Device[];
+  siteId: number;
+  site: Site;
+  edit: boolean;
+
+
+  pager: any = {};
+  pagedItems: Device[];
+  actionResponse: ActionResponse;
+  status: string;
+  onGoingUpload: boolean;
+  onGoingUploadTSV: string;
+  toastrId: number;
+  commActions: DeviceCommActions;
+  createResults: CreateFieldResult[];
+  createResult: CreateFieldResult = {};
+  devicePayload: DeviceRequest; // for update
+  devicePayloadComms: DeviceRequestComms;
+  devicePayloadAssociation: DeviceDLMSAssociationRequest;
+
+  @ViewChild(DeviceLinkComponent)
+  deviceLinkComponent: DeviceLinkComponent;
+
+  constructor(public deviceService: DeviceService, private pagerService: PagerService,
+    private toastrService: ToastrService, private actionResponseService: ActionResponseService,
+    public spinnerService: SpinnerService, private activatedRoute: ActivatedRoute,
+    private setupButton: InterComponentDataService<any>,
+    private siteServie: SiteService, private router: Router) {
+
+    this.commActions = new DeviceCommActions(this.deviceService);
+  }
+
+  ngOnInit() {
+    // flag that reload of resources is done
+    localStorage.setItem('reload', 'true');
+    this.generateSearchComponent();
+    this.siteId = this.activatedRoute.snapshot.params['id'];
+    this.onGetDevices(true);
+    this.onGoingUploadTSV = 'onGoingUploadTSV';
+    this.toastrId = 4619;
+    this.setupButton.AddItem("setupButtonVisible", true);
+
+    if (localStorage.getItem(this.onGoingUploadTSV) != null || (localStorage.getItem(this.onGoingUploadTSV) === 'true')) {
+      this.showOngoingUploadToastr();
+    }
+  }
+
+  onGetDevices(refresh = false, search: SearchResult[] = null) {
+    this.pager = [];
+    this.devices = [];
+
+    let params = new HttpParams();
+
+    if (search !== null) {
+      this.searchValues = search;
+    }
+
+    // Begin assigning parameters
+    if (this.searchValues !== null) {
+      for (let i = 0; i < this.searchValues.length; i++) {
+        params = params.append(this.searchValues[i].Name, this.searchValues[i].Value);
+      }
+    }
+
+    this.siteServie.getSiteById(this.siteId, refresh, params).then((site) => {
+      this.site = site[0];
+      this.devices = this.site.devices;
+      this.clonedDevices = JSON.parse(JSON.stringify(this.devices));
+      this.setPage(1);
+    });
+
+    this.commActions.autoDisconnectLastConnection();
+  }
+
+  onUploadTSV() {
+    if (this.fileSelected == null) {
+      const element: HTMLElement = document.getElementById('inputTSVFile') as HTMLElement;
+      element.click();
+    } else {
+      this.showOngoingUploadToastr();
+      localStorage.setItem(this.onGoingUploadTSV, 'true');
+      let dateTimeNow = new Date(Date.now());
+      console.log('Upload of TSV Started: ' + dateTimeNow);
+
+      this.deviceService.uploadTSV(this.fileSelected, this.siteId).subscribe((actionResponse) => {
+        this.actionResponse = actionResponse;
+      },
+        (error: any) => {
+          this.resetFiles();
+          console.log(error);
+          dateTimeNow = new Date(Date.now());
+          console.log('Upload of TSV Finished: ' + dateTimeNow);
+          localStorage.removeItem(this.onGoingUploadTSV);
+          this.showErrorToastr(error, 'Device Import Failed');
+        },
+        () => {
+          this.resetFiles();
+          this.onGetDevices(true);
+          dateTimeNow = new Date(Date.now());
+          console.log('Upload of TSV Finished: ' + dateTimeNow);
+          this.processImportedDevices();
+        });
+    }
+  }
+
+  onSelectFile($event) {
+    this.fileSelected = $event.target.files[0];
+  }
+
+  setPage(page: number) {
+    // get pager object from service
+    this.pager = this.pagerService.getPager(this.devices.length, page, 100);
+
+    // get current page of items
+    this.pagedItems = this.devices.slice(this.pager.startIndex, this.pager.endIndex + 1);
+  }
+
+  processImportedDevices() {
+    localStorage.removeItem(this.onGoingUploadTSV);
+    this.toastrService.remove(this.toastrId);
+    const dateTimeNow = Date.now().toString();
+    this.actionResponseService.put(dateTimeNow, this.actionResponse);
+    this.showCompleteToastr('<a href="/#/action-response/' + dateTimeNow + '">View Details</a>',
+      'Device Import Complete');
+  }
+
+  resetFiles() {
+    this.onGoingUpload = false;
+    this.form.nativeElement.reset();
+    this.fileSelected = null;
+  }
+
+  getActionResponse() {
+    return this.actionResponse;
+  }
+
+  generateSearchComponent() {
+    // Note: When creating this object, be mindful of the order you're creating it with.
+    // KeyValue pipe returns key-value pair in alphabetical order for strings, ascending for numbers
+
+    // Search Values
+    this.searchField.Name = 'PlantNumber';
+    this.searchField.Description = 'Plant Number';
+    this.searchField.FieldType = 'Search';
+    this.searchField.PlaceHolder = 'Search Device';
+    this.searchFields.push(this.searchField);
+
+    this.searchField = {};
+    this.searchField.Name = 'SerialNumber';
+    this.searchField.Description = 'Serial Number';
+    this.searchField.FieldType = 'Search';
+    this.searchField.PlaceHolder = 'Search Device';
+    this.searchFields.push(this.searchField);
+
+    // Filters
+    this.searchField = {};
+    this.searchField.Name = 'DeviceTypeId';
+    this.searchField.Description = 'Device Type';
+    this.searchField.FieldType = 'Filter';
+    this.searchField.PlaceHolder = 'All Device Type';
+    this.searchField.OptionValues = this.deviceService.getMeterTypeDictionary();
+    this.searchFields.push(this.searchField);
+
+    this.searchField = {};
+    this.searchField.Name = 'Status';
+    this.searchField.Description = 'Device Status';
+    this.searchField.FieldType = 'Filter';
+    this.searchField.PlaceHolder = 'All Device Status';
+    this.searchField.OptionValues = this.deviceService.getDeviceStatusDictionary();
+    this.searchFields.push(this.searchField);
+
+    this.searchModel.SearchFields = this.searchFields;
+  }
+
+  showOngoingUploadToastr() {
+    this.toastrService.remove(this.toastrId); // clean up first before showing another
+    this.onGoingUpload = true; // temporarily disable other tsv uploads when an upload is ongoing
+    this.toastrService.info('Refresh to Update Devices', 'Device Import Ongoing', {
+      easeTime: 300,
+      timeOut: 10000,
+      closeButton: true,
+      tapToDismiss: false,
+      positionClass: 'toast-bottom-left'
+    }).toastId = this.toastrId;
+  }
+
+  showErrorToastr(error: any, title: string) {
+    this.toastrService.remove(this.toastrId); // clean up first before showing another
+    if (error.error.actionResponse != null) {
+      this.actionResponse = new ActionResponse;
+      this.actionResponse.actionResponse = error.error.actionResponse;
+
+      const dateTimeNow = Date.now().toString();
+      this.actionResponseService.put(dateTimeNow, this.actionResponse);
+      this.showCompleteWithErrorsUploadToastr(dateTimeNow);
+    } else {
+      this.toastrService.error(error.error.message, title, {
+        easeTime: 300,
+        timeOut: 10000,
+        closeButton: true,
+        tapToDismiss: false,
+        positionClass: 'toast-bottom-left'
+      });
+    }
+  }
+
+  showCompleteToastr(message: string, title: string) {
+    const html = message;
+    this.toastrService.success(html, title, {
+      enableHtml: true,
+      easeTime: 300,
+      timeOut: 10000,
+      closeButton: true,
+      tapToDismiss: false,
+      positionClass: 'toast-bottom-left'
+    });
+  }
+
+  showCompleteWithErrorsUploadToastr(dateTimeNow: string) {
+    const html = '<a href="/#/action-response/' + dateTimeNow + '">View Details</a>';
+    this.toastrService.warning(html, 'Device Import Completed with Errors', {
+      enableHtml: true,
+      easeTime: 300,
+      timeOut: 10000,
+      closeButton: true,
+      tapToDismiss: false,
+      positionClass: 'toast-bottom-left'
+    });
+  }
+
+  onLinkDevice(linkDevice: Device) {
+    if (this.existOnDevices(linkDevice)) {
+      this.toastrService.clear();
+      this.toastrService.error(`Serial Number ${linkDevice.serialNumber} is already exist in devices to link.`, "Duplicated Error", {
+        easeTime: 300,
+        timeOut: 10000,
+        closeButton: true,
+        tapToDismiss: false,
+        positionClass: 'toast-bottom-left'
+      });
+      return;
+    }
+    this.devices.push(linkDevice);
+    this.setPage(1);
+  }
+
+  onUnlinkDevice(unlinkDevice: Device) {
+    this.devices.forEach((item, index) => {
+      if (item.deviceId == unlinkDevice.deviceId) {
+        this.devices.splice(index, 1);
+      }
+    });
+    this.setPage(1);
+  }
+
+  existOnDevices(device: Device) {
+    let exist = false;
+    this.devices.forEach((item, index) => {
+      if (item.deviceId == device.deviceId) {
+        exist = true;
+      }
+    });
+    return exist;
+  }
+
+  onCreateDevice(createResults: CreateFieldResult[]) {
+    this.devicePayload = this.initializeDeviceRequest();
+
+    for (let i = 0; i < createResults.length; i++) {
+      if (this.devicePayload.hasOwnProperty(createResults[i].Name)) {
+        this.devicePayload[createResults[i].Name] = createResults[i].Value;
+      }
+    }
+
+    for (let i = 0; i < createResults.length; i++) {
+      if (this.devicePayload.DeviceComms.hasOwnProperty(createResults[i].Name)) {
+        this.devicePayload.DeviceComms[createResults[i].Name] = createResults[i].Value;
+      }
+    }
+
+    for (let i = 0; i < createResults.length; i++) {
+      if (this.devicePayload.DLMSAssociation.hasOwnProperty(createResults[i].Name)) {
+        this.devicePayload.DLMSAssociation[createResults[i].Name] = createResults[i].Value;
+      }
+    }
+    
+    console.log(this.devicePayload);
+
+    this.deviceService.createDeviceInformation(this.devicePayload).subscribe((StandardResponse) => {
+    },
+      (error: any) => {
+        console.log(error);
+        this.showErrorToastr(error, 'Device Create Unsuccessful');
+      },
+      () => {
+        console.log('success create');
+        this.onGetDevices(true);
+        this.showCompleteToastr('Device Create Successful. <br/> Please Refresh List',
+          'Device Create Complete');
+      });
+  }
+
+  initializeDeviceRequest(): DeviceRequest {
+    this.devicePayload = new DeviceRequest;
+    this.devicePayload.SerialNumber = '';
+    this.devicePayload.PlantNumber = '';
+    this.devicePayload.SystemTitle = '';
+    this.devicePayload.DeviceStatus = '';
+    this.devicePayload.DeviceType = '';
+    this.devicePayload.FirmwareVersion = '';
+    this.devicePayload.SiteID = this.siteId;
+
+    this.devicePayload.DeviceComms = new DeviceRequestComms;
+    this.devicePayload.DeviceComms.CommunicationProfile = '';
+    this.devicePayload.DeviceComms.SupportingLayer = '';
+    this.devicePayload.DeviceComms.IECOpening = true;
+    this.devicePayload.DeviceComms.BaudRate = 0;
+    this.devicePayload.DeviceComms.Parity = '';
+    this.devicePayload.DeviceComms.StopBits = '';
+    this.devicePayload.DeviceComms.DataBits = 5;
+    this.devicePayload.DeviceComms.IPAddress = '';
+    this.devicePayload.DeviceComms.Port = 0;
+    this.devicePayload.DeviceComms.Timeout = 0;
+    this.devicePayload.DeviceComms.DLMSLogical = 0;
+    this.devicePayload.DeviceComms.DLMSPhysical = 0;
+    this.devicePayload.DeviceComms.DLMSAddressScheme = 0;
+    this.devicePayload.DeviceComms.HDLCTimeout = 0;
+    this.devicePayload.DeviceComms.Timeout = 0;
+
+    this.devicePayload.DLMSAssociation = new DeviceDLMSAssociationRequest;
+    this.devicePayload.DLMSAssociation.ClientId = '';
+    this.devicePayload.DLMSAssociation.Password = '';
+    this.devicePayload.DLMSAssociation.ApplicationContext = '';
+    this.devicePayload.DLMSAssociation.AuthenticationMethod = '';
+    return this.devicePayload;
+  }
+
+  routeLink(deviceObj: Device) {
+    if (!this.edit) {
+      this.router.navigate([`/devices/${deviceObj.deviceId}`]);
+    }
+  }
+
+  onEditDeviceBySite() {
+    
+  }
+
+  onCancelDeviceBySite() {
+    this.devices = JSON.parse(JSON.stringify(this.clonedDevices));
+    this.setPage(1);
+  }
+
+  onSaveDevices() {
+    let devicesSitePayload = new DevicesSiteRequest();
+    devicesSitePayload.siteID = this.siteId;
+
+    for (let device of this.devices) {
+      let deviceIDRequest = new DeviceIDRequest();
+      deviceIDRequest.deviceId = device.deviceId;
+      devicesSitePayload.devices.push(deviceIDRequest);
+    }
+
+    this.siteServie.updateDevicesBySite(this.siteId, devicesSitePayload).subscribe((StandardResponse) => {
+      this.edit = false;
+      this.deviceLinkComponent.onGetDevices(true);
+      this.showCompleteToastr('Devices successfully updated in Site.',
+        'Complete');
+    },
+      (error: any) => {
+        console.log(error);
+        this.showErrorToastr(error, 'Error');
+      },
+      () => {
+        console.log('finished...');
+      });
+  }
+
+  onTblSelectChange() {
+
+  }
+}

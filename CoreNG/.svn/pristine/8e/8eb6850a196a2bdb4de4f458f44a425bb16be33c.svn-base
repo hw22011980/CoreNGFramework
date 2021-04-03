@@ -1,0 +1,12 @@
+import { TestBed } from '@angular/core/testing';
+
+import { ActionResponseService } from './action-response.service';
+
+describe('ActionResponseService', () => {
+  beforeEach(() => TestBed.configureTestingModule({}));
+
+  it('should be created', () => {
+    const service: ActionResponseService = TestBed.get(ActionResponseService);
+    expect(service).toBeTruthy();
+  });
+});

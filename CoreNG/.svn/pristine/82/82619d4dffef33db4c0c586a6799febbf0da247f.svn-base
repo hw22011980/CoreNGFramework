@@ -1,0 +1,125 @@
+import { InformationField } from 'src/app/info-display/info-display.model';
+import { DeviceService } from '../../device.service';
+import { Device } from '../../shared/device.model';
+
+let infoFields: InformationField[] = [];
+let infoField: InformationField = {};
+
+export class DeviceInfoFieldsDefinition {
+    getDeviceInfoFields(deviceService: DeviceService, device: Device): InformationField[] {
+        infoFields = [];
+
+        infoField.Name = 'PlantNumber';
+        infoField.Description = 'Plant Number';
+        infoField.Value = device.plantNumber.toString();
+        infoField.Editable = true;
+        infoField.FieldType = 'Text';
+        infoField.Required = true;
+        infoField.MaxLength = 50;
+        infoField.AlphaNumeric = false;
+        infoFields.push(infoField);
+
+        infoField = {};
+        infoField.Name = 'SerialNumber';
+        infoField.Description = 'Serial Number';
+        infoField.Value = device.serialNumber.toString();
+        infoField.Editable = true;
+        infoField.FieldType = 'Text';
+        infoField.Required = true;
+        infoField.MaxLength = 50;
+        infoField.AlphaNumeric = false;
+        infoFields.push(infoField);
+
+        infoField = {};
+        infoField.Name = 'SystemTitle';
+        infoField.Description = 'System Title';
+        infoField.Value = device.systemTitle.toString();
+        infoField.Editable = true;
+        infoField.MaxLength = 50;
+        infoField.FieldType = 'Text';
+        infoField.Required = true;
+        infoField.AlphaNumeric = true;
+        infoFields.push(infoField);
+
+        infoField = {};
+        infoField.Name = 'SiteID';
+        infoField.Description = 'Site';
+        infoField.Value = device.deviceSite.siteID;
+        infoField.DisplayValue = device.deviceSite.siteName;
+        infoField.Editable = true;
+        infoField.FieldType = 'DropDown';
+        infoField.OptionValues = deviceService.getSiteDictionary();
+        infoField.Required = true;
+        infoFields.push(infoField);
+
+        infoField = {};
+        infoField.Name = 'DeviceType';
+        infoField.Description = 'Device Type';
+        infoField.Value = device.deviceType.deviceTypeId;
+        infoField.DisplayValue = device.deviceStatus.description;
+        infoField.Editable = true;
+        infoField.FieldType = 'DropDown';
+        infoField.OptionValues = deviceService.getMeterTypeDictionary();
+        infoField.OptionValues2 = device.deviceType.availableModels;
+        infoField.Required = true;
+        infoFields.push(infoField);
+
+        const list = infoField.OptionValues2;
+        const list2: any = {};
+        for (let j = 0; j < list.length; j++) {
+          list2[list[j].deviceModelName] = list[j].deviceModelID;
+        }
+
+        infoField = {};
+        infoField.Name = 'DeviceModel';
+        infoField.Description = 'Device Model';
+        infoField.Value = device.deviceModel.deviceModelID;
+        infoField.DisplayValue = device.deviceModel.deviceModelName;
+        infoField.Editable = true;
+        infoField.FieldType = 'DropDown';
+        infoField.OptionValues = list2;
+        infoField.Required = true;
+        infoFields.push(infoField);
+
+        infoField = {};
+        infoField.Name = 'FirmwareVersion';
+        infoField.Description = 'Firmware Version';
+        infoField.Value = device.firmwareVersion;
+        infoField.Editable = true;
+        infoField.FieldType = 'Text';
+        infoField.MaxLength = 50;
+        infoField.AlphaNumeric = true;
+        infoField.Required = false;
+        infoFields.push(infoField);
+
+        infoField = {};
+        infoField.Name = 'DeviceStatus';
+        infoField.Description = 'Device Status';
+        infoField.Value = device.deviceStatus.id.toString();
+        infoField.DisplayValue = device.deviceStatus.description;
+        infoField.Editable = true;
+        infoField.FieldType = 'DropDown';
+        infoField.OptionValues = deviceService.getDeviceStatusDictionary();
+        infoField.Required = true;
+        infoFields.push(infoField);
+
+        infoField = {};
+        infoField.Name = 'CreateDate';
+        infoField.Description = 'Create Date';
+        infoField.Value = device.createDate;
+        infoField.Editable = false;
+        infoField.FieldType = 'DateTime';
+        infoField.Required = true;
+        infoFields.push(infoField);
+
+        infoField = {};
+        infoField.Name = 'CommissionDate';
+        infoField.Description = 'Commission Date';
+        infoField.Value = device.commissionDate;
+        infoField.Editable = false;
+        infoField.FieldType = 'DateTime';
+        infoField.Required = true;
+        infoFields.push(infoField);
+        return infoFields;
+    }
+}

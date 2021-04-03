@@ -1,0 +1,14 @@
+.card {
+    margin: 0 auto; /* Added */
+    float: none; /* Added */
+    margin-bottom: 10px; /* Added */
+}
+#close-button
+{
+  margin-top: 5px;   
+  margin-right: 20px; /* Added */
+}
+
+.btn:hover {
+    background-color: #700c0e !important
+}
