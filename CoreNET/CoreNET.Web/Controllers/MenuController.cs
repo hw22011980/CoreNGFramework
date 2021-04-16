@@ -48,7 +48,7 @@ namespace CoreNET.API.Controllers
     }
     private List<MenuPayload> GetListofMenu(string idApp)
     {
-      List<MenuBO> temp = dbHelper.GetSetupTree(idApp);
+      List<MenuBO> temp = dbHelper.GetMenu(idApp);
       List<MenuPayload> data = MenuPayload.Convert(temp);
       return data;
     }

@@ -8,7 +8,7 @@ namespace CoreNET.Common.Base
 {
   public partial class DBHelper
   {
-    public List<MenuBO> GetSetupTree(string idapp)
+    public List<MenuBO> GetMenu(string idapp)
     {
       List<MenuBO> MenuLevel1 = GetAppMenu(idapp, 1);
       foreach (MenuBO m in MenuLevel1)
