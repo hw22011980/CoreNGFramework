@@ -1,2 +1,2 @@
-# CoreNGFramework
-Angular version of CoreNET Framework 2008
+# CoreNET Anguglar Framework
+Angular version of CoreNET Framework
