@@ -1,5 +1,0 @@
-export class ErrorResponse {
-    dateTime: Date;
-    message: string;
-    status: number;
-}

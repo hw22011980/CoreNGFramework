@@ -1,9 +1,0 @@
-export class License {
-    public index: number;
-    public licenseKey: string;
-    public unlockCode: string;
-    public unlockKey: string;
-    public oldLicenseKeys?: string[];
-
-    constructor(){}
-}

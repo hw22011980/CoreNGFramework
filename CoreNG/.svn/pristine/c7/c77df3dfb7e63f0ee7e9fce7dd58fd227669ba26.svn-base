@@ -1,5 +1,0 @@
-<div class="container-fluid">
-  <div class="mr-5">
-    <router-outlet></router-outlet>
-  </div>
-</div>

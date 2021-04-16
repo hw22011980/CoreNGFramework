@@ -1,6 +1,0 @@
-import { ActionResponseInfo } from './action-response-info.model';
-
-
-export class ActionResponse {
-    actionResponse: ActionResponseInfo;
-}

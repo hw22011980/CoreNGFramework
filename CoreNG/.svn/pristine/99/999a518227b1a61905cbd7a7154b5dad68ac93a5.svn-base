@@ -1,9 +1,0 @@
-<label style="color: #700c0e;font-weight: 600;">Reading Transformer Ratio from Meter ...</label>
-<div class="progress" [style.height.px]="height">
-  <div class="progress-bar{{type ? ' bg-' + type : ''}}{{textType ? ' text-' + textType: ''}}{{animated ? ' progress-bar-animated' : ''}}{{striped ? ' progress-bar-striped' : ''}}"
-    role="progressbar" [style.width.%]="getPercentValue()" [attr.aria-valuenow]="getValue()" aria-valuemin="0"
-    [attr.aria-valuemax]="max">
-    <span *ngIf="showValue">{{getValue() / max | percent}}</span>
-    <ng-content></ng-content>
-  </div>
-</div>

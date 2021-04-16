@@ -1,5 +1,0 @@
-import {DLMSAssociation} from './dlms-asssociation.model';
-
-export class DlmsAssociations {
-  dlmsAssociations: DLMSAssociation[];
-}

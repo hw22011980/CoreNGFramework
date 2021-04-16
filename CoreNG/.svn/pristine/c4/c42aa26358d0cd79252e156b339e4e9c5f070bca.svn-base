@@ -1,5 +1,0 @@
-export class JobActionParamsData {
-  jobActionParamId: number;
-  paramName: string;
-  paramValue: string;
-}

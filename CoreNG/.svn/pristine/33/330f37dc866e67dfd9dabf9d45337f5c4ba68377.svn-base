@@ -1,4 +1,0 @@
- {
-	 "mddcsRestApi": "http://localhost:8183/mddcs/api/",
-	 "checkingConnectionInterval": 5
- }

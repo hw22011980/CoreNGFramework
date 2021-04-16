@@ -1,3 +1,0 @@
-<app-progressbar type="success" textType="white" [value]="showPercent()" [showValue]="true" [height]="23" [striped]="true"
-  [animated]="true">
-</app-progressbar>

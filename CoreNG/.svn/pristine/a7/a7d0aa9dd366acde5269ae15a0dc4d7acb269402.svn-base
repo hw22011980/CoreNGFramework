@@ -1,9 +1,0 @@
-export class TableInformation {
-    Header?: string[];
-    Rows?: TableRow[];
-    Router?: string;
-}
-
-export class TableRow {
-    Column?: String[];
-}

@@ -1,7 +1,0 @@
-import {Device} from './device.model';
-
-export class Devices {
-public devices: Device[];
-}
-
-

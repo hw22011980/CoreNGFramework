@@ -1,7 +1,0 @@
-export class StandardResponse {
-    success: boolean;
-    dateTime: any;
-    code: number;
-    message: String;
-    data: any;
-}
