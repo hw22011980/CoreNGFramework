@@ -1,0 +1,9 @@
+D:\CoreNG\CoreNGFramework\CoreNET\CoreNET.Generator\bin\Debug\CoreNET.Generator.exe.config
+D:\CoreNG\CoreNGFramework\CoreNET\CoreNET.Generator\bin\Debug\CoreNET.Generator.exe
+D:\CoreNG\CoreNGFramework\CoreNET\CoreNET.Generator\bin\Debug\CoreNET.Generator.pdb
+D:\CoreNG\CoreNGFramework\CoreNET\CoreNET.Generator\obj\Debug\CoreNET.Generator.Form1.resources
+D:\CoreNG\CoreNGFramework\CoreNET\CoreNET.Generator\obj\Debug\CoreNET.Generator.Properties.Resources.resources
+D:\CoreNG\CoreNGFramework\CoreNET\CoreNET.Generator\obj\Debug\CoreNET.Generator.csproj.GenerateResource.cache
+D:\CoreNG\CoreNGFramework\CoreNET\CoreNET.Generator\obj\Debug\CoreNET.Generator.csproj.CoreCompileInputs.cache
+D:\CoreNG\CoreNGFramework\CoreNET\CoreNET.Generator\obj\Debug\CoreNET.Generator.exe
+D:\CoreNG\CoreNGFramework\CoreNET\CoreNET.Generator\obj\Debug\CoreNET.Generator.pdb

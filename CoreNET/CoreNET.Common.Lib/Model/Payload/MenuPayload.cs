@@ -22,7 +22,7 @@ namespace CoreNET.Common.Base
       UITemplate = -1;
     }
 
-    public static List<MenuPayload> Convert(List<MenuBO> temps)
+    public static List<MenuPayload> Convert(List<Appmenu> temps)
     {
       List<MenuPayload> data = new List<MenuPayload>();
       foreach (var o in temps)
@@ -33,7 +33,7 @@ namespace CoreNET.Common.Base
       return data;
     }
 
-    private static MenuPayload Convert(MenuBO o)
+    private static MenuPayload Convert(Appmenu o)
     {
       MenuPayload data = new MenuPayload();
       data.Id = o.Idmenu;
@@ -44,7 +44,7 @@ namespace CoreNET.Common.Base
       data.Selected = 0;
       if (o.Children != null)
       {
-        data.Children = o.Children.ConvertAll(new Converter<MenuBO, MenuPayload>(delegate (MenuBO o) { return Convert(o); }));
+        data.Children = o.Children.ConvertAll(new Converter<Appmenu, MenuPayload>(delegate (Appmenu o) { return Convert(o); }));
       }
       return data;
     }

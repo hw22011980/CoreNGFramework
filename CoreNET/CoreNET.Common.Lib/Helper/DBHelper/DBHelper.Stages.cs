@@ -41,7 +41,7 @@ namespace CoreNET.Common.Base
         return ((StageDef)list[0]);
       }
     }
-    public List<MenuBO> GetDeviceParam(int modelId, string paramId)
+    public List<Appmenu> GetDeviceParam(int modelId, string paramId)
     {
       string cs = ConnectionString;
       string sql = string.Empty;
@@ -58,14 +58,14 @@ namespace CoreNET.Common.Base
                 exec sp_devicestageparam_byStageID_get -1
           ";
       }
-      MenuBO bo = new MenuBO() { ConnectionString = cs };
+      Appmenu bo = new Appmenu() { ConnectionString = cs };
       List<BaseBO> list = BaseDataAdapter.GetListObject(bo, sql, new string[] {
         "Id","Name","UITemplate", "Selected"
       });
-      List<MenuBO> data = list.ConvertAll<MenuBO>(new Converter<BaseBO, MenuBO>(
+      List<Appmenu> data = list.ConvertAll<Appmenu>(new Converter<BaseBO, Appmenu>(
         delegate (BaseBO par)
         {
-          return (MenuBO)par;
+          return (Appmenu)par;
         }
       ));
       return data;
@@ -237,10 +237,10 @@ namespace CoreNET.Common.Base
       else
       {
         List<StageData> newList = new List<StageData>();
-        List<MenuBO> menus = GetDeviceParam(modelID, "-1");
+        List<Appmenu> menus = GetDeviceParam(modelID, "-1");
         for (int i = 0; i < menus.Count; i++)
         {
-          MenuBO data = menus[i];
+          Appmenu data = menus[i];
           StageData newdata = GetDeviceObisByParamID(modelID, data.Idapp);
           newList.Add(newdata);
         }

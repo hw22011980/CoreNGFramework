@@ -62,4 +62,7 @@
     <None Include="local\mddcsdb.scmp" />
     <None Include="local\mddcsdb.dcmp" />
   </ItemGroup>
+  <ItemGroup>
+    <Build Include="APP.sql" />
+  </ItemGroup>
 </Project>

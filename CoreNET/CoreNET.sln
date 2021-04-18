@@ -9,6 +9,8 @@ Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "CoreNET.DB", "CoreNET.DB\Co
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CoreNET.Web", "CoreNET.Web\CoreNET.Web.csproj", "{0645B2B5-E8C7-410E-A577-55FF0E539BCC}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CoreNET.Generator", "CoreNET.Generator\CoreNET.Generator.csproj", "{AAAA07B4-46B1-4223-829B-52232EA3FCC6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -29,6 +31,10 @@ Global
 		{0645B2B5-E8C7-410E-A577-55FF0E539BCC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0645B2B5-E8C7-410E-A577-55FF0E539BCC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0645B2B5-E8C7-410E-A577-55FF0E539BCC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AAAA07B4-46B1-4223-829B-52232EA3FCC6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AAAA07B4-46B1-4223-829B-52232EA3FCC6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AAAA07B4-46B1-4223-829B-52232EA3FCC6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AAAA07B4-46B1-4223-829B-52232EA3FCC6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -8,17 +8,17 @@ namespace CoreNET.Common.Base
 {
   public partial class DBHelper
   {
-    public List<MenuBO> GetMenu(string idapp)
+    public List<Appmenu> GetMenu(string idapp)
     {
-      List<MenuBO> MenuLevel1 = GetAppMenu(idapp, 1);
-      foreach (MenuBO m in MenuLevel1)
+      List<Appmenu> MenuLevel1 = GetAppMenu(idapp, 1);
+      foreach (Appmenu m in MenuLevel1)
       {
-        List<MenuBO> MenuLevel2 = GetAppMenu(idapp, 2);
+        List<Appmenu> MenuLevel2 = GetAppMenu(idapp, 2);
         m.Children = MenuLevel2;
       }
       return MenuLevel1;
     }
-    private List<MenuBO> GetAppMenu(string idapp, int kdlevel)
+    private List<Appmenu> GetAppMenu(string idapp, int kdlevel)
     {
       string cs = ConnectionString;
       string sql = string.Empty;
@@ -31,7 +31,7 @@ namespace CoreNET.Common.Base
               where IDAPP={idapp} and KDLEVEL={kdlevel}
           ";
       List<Dictionary<string, object>> list = DataAdapter.ExecuteSelect(cs, sql);
-      List<MenuBO> data = MenuBO.ConvertList(list);
+      List<Appmenu> data = Appmenu.ConvertList(list);
       return data;
     }
   }
