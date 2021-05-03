@@ -2,9 +2,9 @@
 {
 
 
-  partial class CORENETDataSet
-  {
-  }
+    partial class CORENETDataSet
+    {
+    }
 }
 
 namespace CoreNET.Generator.CORENETDataSetTableAdapters
