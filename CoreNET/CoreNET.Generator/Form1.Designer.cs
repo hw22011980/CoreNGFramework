@@ -31,16 +31,16 @@ namespace CoreNET.Generator
     {
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
-            System.Windows.Forms.TreeNode treeNode5 = new System.Windows.Forms.TreeNode("Daftar Aplikasi");
-            System.Windows.Forms.TreeNode treeNode6 = new System.Windows.Forms.TreeNode("Daftar Menu");
-            System.Windows.Forms.TreeNode treeNode7 = new System.Windows.Forms.TreeNode("Daftar Fields");
-            System.Windows.Forms.TreeNode treeNode8 = new System.Windows.Forms.TreeNode("Utama", new System.Windows.Forms.TreeNode[] {
-            treeNode5,
-            treeNode6,
-            treeNode7});
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle5 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle6 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.TreeNode treeNode1 = new System.Windows.Forms.TreeNode("Daftar Aplikasi");
+            System.Windows.Forms.TreeNode treeNode2 = new System.Windows.Forms.TreeNode("Daftar Menu");
+            System.Windows.Forms.TreeNode treeNode3 = new System.Windows.Forms.TreeNode("Daftar Fields");
+            System.Windows.Forms.TreeNode treeNode4 = new System.Windows.Forms.TreeNode("Utama", new System.Windows.Forms.TreeNode[] {
+            treeNode1,
+            treeNode2,
+            treeNode3});
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.mainToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -64,6 +64,9 @@ namespace CoreNET.Generator
             this.aPPBindingSource = new System.Windows.Forms.BindingSource(this.components);
             this.cORENETDataSet = new CoreNET.Generator.CORENETDataSet();
             this.PnlRight1 = new System.Windows.Forms.Panel();
+            this.btHapus = new System.Windows.Forms.Button();
+            this.btEdit = new System.Windows.Forms.Button();
+            this.btAdd = new System.Windows.Forms.Button();
             this.cbStatusApp = new System.Windows.Forms.ComboBox();
             this.cbLevelApp = new System.Windows.Forms.ComboBox();
             this.rdDApp = new System.Windows.Forms.RadioButton();
@@ -171,9 +174,6 @@ namespace CoreNET.Generator
             this.aPPTableAdapter = new CoreNET.Generator.CORENETDataSetTableAdapters.APPTableAdapter();
             this.aPPMENUTableAdapter = new CoreNET.Generator.CORENETDataSetTableAdapters.APPMENUTableAdapter();
             this.aPPMENUFIELDSTableAdapter = new CoreNET.Generator.CORENETDataSetTableAdapters.APPMENUFIELDSTableAdapter();
-            this.btAdd = new System.Windows.Forms.Button();
-            this.btEdit = new System.Windows.Forms.Button();
-            this.btHapus = new System.Windows.Forms.Button();
             this.menuStrip1.SuspendLayout();
             this.toolStrip1.SuspendLayout();
             this.MainPanel.SuspendLayout();
@@ -313,19 +313,19 @@ namespace CoreNET.Generator
             this.treeView1.Location = new System.Drawing.Point(0, 0);
             this.treeView1.Margin = new System.Windows.Forms.Padding(4);
             this.treeView1.Name = "treeView1";
-            treeNode5.Name = "Node1";
-            treeNode5.Tag = "0";
-            treeNode5.Text = "Daftar Aplikasi";
-            treeNode6.Name = "Node2";
-            treeNode6.Tag = "1";
-            treeNode6.Text = "Daftar Menu";
-            treeNode7.Name = "Node3";
-            treeNode7.Tag = "2";
-            treeNode7.Text = "Daftar Fields";
-            treeNode8.Name = "Node0";
-            treeNode8.Text = "Utama";
+            treeNode1.Name = "Node1";
+            treeNode1.Tag = "0";
+            treeNode1.Text = "Daftar Aplikasi";
+            treeNode2.Name = "Node2";
+            treeNode2.Tag = "1";
+            treeNode2.Text = "Daftar Menu";
+            treeNode3.Name = "Node3";
+            treeNode3.Tag = "2";
+            treeNode3.Text = "Daftar Fields";
+            treeNode4.Name = "Node0";
+            treeNode4.Text = "Utama";
             this.treeView1.Nodes.AddRange(new System.Windows.Forms.TreeNode[] {
-            treeNode8});
+            treeNode4});
             this.treeView1.Size = new System.Drawing.Size(142, 432);
             this.treeView1.TabIndex = 0;
             this.treeView1.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.treeView1_AfterSelect);
@@ -413,8 +413,8 @@ namespace CoreNET.Generator
             // sTATUSDataGridViewTextBoxColumn
             // 
             this.sTATUSDataGridViewTextBoxColumn.DataPropertyName = "STATUS";
-            dataGridViewCellStyle4.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            this.sTATUSDataGridViewTextBoxColumn.DefaultCellStyle = dataGridViewCellStyle4;
+            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            this.sTATUSDataGridViewTextBoxColumn.DefaultCellStyle = dataGridViewCellStyle1;
             this.sTATUSDataGridViewTextBoxColumn.HeaderText = "STATUS";
             this.sTATUSDataGridViewTextBoxColumn.MinimumWidth = 6;
             this.sTATUSDataGridViewTextBoxColumn.Name = "sTATUSDataGridViewTextBoxColumn";
@@ -423,8 +423,8 @@ namespace CoreNET.Generator
             // kDLEVELDataGridViewTextBoxColumn
             // 
             this.kDLEVELDataGridViewTextBoxColumn.DataPropertyName = "KDLEVEL";
-            dataGridViewCellStyle5.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            this.kDLEVELDataGridViewTextBoxColumn.DefaultCellStyle = dataGridViewCellStyle5;
+            dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            this.kDLEVELDataGridViewTextBoxColumn.DefaultCellStyle = dataGridViewCellStyle2;
             this.kDLEVELDataGridViewTextBoxColumn.HeaderText = "KDLEVEL";
             this.kDLEVELDataGridViewTextBoxColumn.MinimumWidth = 6;
             this.kDLEVELDataGridViewTextBoxColumn.Name = "kDLEVELDataGridViewTextBoxColumn";
@@ -433,8 +433,8 @@ namespace CoreNET.Generator
             // tYPEDataGridViewTextBoxColumn
             // 
             this.tYPEDataGridViewTextBoxColumn.DataPropertyName = "TYPE";
-            dataGridViewCellStyle6.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            this.tYPEDataGridViewTextBoxColumn.DefaultCellStyle = dataGridViewCellStyle6;
+            dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            this.tYPEDataGridViewTextBoxColumn.DefaultCellStyle = dataGridViewCellStyle3;
             this.tYPEDataGridViewTextBoxColumn.HeaderText = "TYPE";
             this.tYPEDataGridViewTextBoxColumn.MinimumWidth = 6;
             this.tYPEDataGridViewTextBoxColumn.Name = "tYPEDataGridViewTextBoxColumn";
@@ -476,6 +476,36 @@ namespace CoreNET.Generator
             this.PnlRight1.Name = "PnlRight1";
             this.PnlRight1.Size = new System.Drawing.Size(369, 395);
             this.PnlRight1.TabIndex = 0;
+            // 
+            // btHapus
+            // 
+            this.btHapus.Location = new System.Drawing.Point(194, 13);
+            this.btHapus.Name = "btHapus";
+            this.btHapus.Size = new System.Drawing.Size(75, 23);
+            this.btHapus.TabIndex = 19;
+            this.btHapus.Text = "Hapus";
+            this.btHapus.UseVisualStyleBackColor = true;
+            this.btHapus.Click += new System.EventHandler(this.btHapus_Click);
+            // 
+            // btEdit
+            // 
+            this.btEdit.Location = new System.Drawing.Point(113, 13);
+            this.btEdit.Name = "btEdit";
+            this.btEdit.Size = new System.Drawing.Size(75, 23);
+            this.btEdit.TabIndex = 18;
+            this.btEdit.Text = "Edit";
+            this.btEdit.UseVisualStyleBackColor = true;
+            this.btEdit.Click += new System.EventHandler(this.btEdit_Click);
+            // 
+            // btAdd
+            // 
+            this.btAdd.Location = new System.Drawing.Point(32, 13);
+            this.btAdd.Name = "btAdd";
+            this.btAdd.Size = new System.Drawing.Size(75, 23);
+            this.btAdd.TabIndex = 17;
+            this.btAdd.Text = "Add";
+            this.btAdd.UseVisualStyleBackColor = true;
+            this.btAdd.Click += new System.EventHandler(this.btAdd_Click);
             // 
             // cbStatusApp
             // 
@@ -1534,36 +1564,6 @@ namespace CoreNET.Generator
             // aPPMENUFIELDSTableAdapter
             // 
             this.aPPMENUFIELDSTableAdapter.ClearBeforeFill = true;
-            // 
-            // btAdd
-            // 
-            this.btAdd.Location = new System.Drawing.Point(32, 13);
-            this.btAdd.Name = "btAdd";
-            this.btAdd.Size = new System.Drawing.Size(75, 23);
-            this.btAdd.TabIndex = 17;
-            this.btAdd.Text = "Add";
-            this.btAdd.UseVisualStyleBackColor = true;
-            this.btAdd.Click += new System.EventHandler(this.btAdd_Click);
-            // 
-            // btEdit
-            // 
-            this.btEdit.Location = new System.Drawing.Point(113, 13);
-            this.btEdit.Name = "btEdit";
-            this.btEdit.Size = new System.Drawing.Size(75, 23);
-            this.btEdit.TabIndex = 18;
-            this.btEdit.Text = "Edit";
-            this.btEdit.UseVisualStyleBackColor = true;
-            this.btEdit.Click += new System.EventHandler(this.btEdit_Click);
-            // 
-            // btHapus
-            // 
-            this.btHapus.Location = new System.Drawing.Point(194, 13);
-            this.btHapus.Name = "btHapus";
-            this.btHapus.Size = new System.Drawing.Size(75, 23);
-            this.btHapus.TabIndex = 19;
-            this.btHapus.Text = "Hapus";
-            this.btHapus.UseVisualStyleBackColor = true;
-            this.btHapus.Click += new System.EventHandler(this.btHapus_Click);
             // 
             // Form1
             // 
