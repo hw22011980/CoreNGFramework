@@ -7,3 +7,13 @@ D:\CoreNG\CoreNGFramework\CoreNET\CoreNET.Generator\obj\Debug\CoreNET.Generator.
 D:\CoreNG\CoreNGFramework\CoreNET\CoreNET.Generator\obj\Debug\CoreNET.Generator.csproj.CoreCompileInputs.cache
 D:\CoreNG\CoreNGFramework\CoreNET\CoreNET.Generator\obj\Debug\CoreNET.Generator.exe
 D:\CoreNG\CoreNGFramework\CoreNET\CoreNET.Generator\obj\Debug\CoreNET.Generator.pdb
+D:\Angular\CoreNGFramework\CoreNET\CoreNET.Generator\bin\Debug\CoreNET.Generator.exe.config
+D:\Angular\CoreNGFramework\CoreNET\CoreNET.Generator\bin\Debug\CoreNET.Generator.exe
+D:\Angular\CoreNGFramework\CoreNET\CoreNET.Generator\bin\Debug\CoreNET.Generator.pdb
+D:\Angular\CoreNGFramework\CoreNET\CoreNET.Generator\obj\Debug\CoreNET.Generator.csprojAssemblyReference.cache
+D:\Angular\CoreNGFramework\CoreNET\CoreNET.Generator\obj\Debug\CoreNET.Generator.Form1.resources
+D:\Angular\CoreNGFramework\CoreNET\CoreNET.Generator\obj\Debug\CoreNET.Generator.Properties.Resources.resources
+D:\Angular\CoreNGFramework\CoreNET\CoreNET.Generator\obj\Debug\CoreNET.Generator.csproj.GenerateResource.cache
+D:\Angular\CoreNGFramework\CoreNET\CoreNET.Generator\obj\Debug\CoreNET.Generator.csproj.CoreCompileInputs.cache
+D:\Angular\CoreNGFramework\CoreNET\CoreNET.Generator\obj\Debug\CoreNET.Generator.exe
+D:\Angular\CoreNGFramework\CoreNET\CoreNET.Generator\obj\Debug\CoreNET.Generator.pdb
